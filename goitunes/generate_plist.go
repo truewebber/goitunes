@@ -3,7 +3,7 @@ package goitunes
 import (
 	"fmt"
 
-	"appticadev.visualstudio.com/apptica/_git/goitunes/model"
+	"github.com/truewebber/goitunes/model"
 )
 
 var (

@@ -4,8 +4,8 @@ import (
 	"fmt"
 	"testing"
 
-	"appticadev.visualstudio.com/apptica/_git/goitunes/model"
-	"appticadev.visualstudio.com/apptica/_git/goitunes/store"
+	"github.com/truewebber/goitunes/model"
+	"github.com/truewebber/store"
 )
 
 var (

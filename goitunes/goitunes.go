@@ -14,9 +14,8 @@ import (
 
 	"github.com/groob/plist"
 	"github.com/mgutz/logxi/v1"
-
-	"appticadev.visualstudio.com/apptica/_git/goitunes/model"
-	"appticadev.visualstudio.com/apptica/_git/goitunes/store"
+	"github.com/truewebber/goitunes/model"
+	"github.com/truewebber/goitunes/store"
 )
 
 type (
