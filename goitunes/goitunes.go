@@ -14,8 +14,8 @@ import (
 
 	"github.com/groob/plist"
 	"github.com/mgutz/logxi/v1"
-	"github.com/truewebber/goitunes/model"
-	"github.com/truewebber/goitunes/store"
+	"github.com/Truewebber/goitunes/model"
+	"github.com/Truewebber/goitunes/store"
 )
 
 type (

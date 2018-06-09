@@ -4,8 +4,8 @@ import (
 	"fmt"
 	"testing"
 
-	"github.com/truewebber/goitunes/model"
-	"github.com/truewebber/store"
+	"github.com/Truewebber/goitunes/model"
+	"github.com/Truewebber/store"
 )
 
 var (
