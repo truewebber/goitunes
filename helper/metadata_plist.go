@@ -1,4 +1,4 @@
-package goitunes
+package helper
 
 import (
 	"fmt"
@@ -87,7 +87,9 @@ var (
 	//</array>
 )
 
-func (g *GOiTunes) generateMetadataPlist(bundleId string, songPlist model.SongPlistSlice) []byte {
+func GenerateMetadataPlist(
+	bundleId string, songPlist model.SongPlistSlice, xAppleStoreFront string, storeFront int,
+) []byte {
 	softwareSupportedDeviceIds := ""
 	for _, val := range songPlist.MetaData.SoftwareSupportedDeviceIds {
 		softwareSupportedDeviceIds += fmt.Sprintf("<integer>%d</integer>", val)
@@ -104,7 +106,7 @@ func (g *GOiTunes) generateMetadataPlist(bundleId string, songPlist model.SongPl
 		songPlist.MetaData.DisplayBundleId,
 		songPlist.MetaData.BundleShortVersionString,
 		songPlist.MetaData.BundleVersion,
-		g.getStore().XAppleStoreFront,
+		xAppleStoreFront,
 		songPlist.PurchaseDate,
 		songPlist.MetaData.Copyright,
 		songPlist.MetaData.DrmVersionNumber,
@@ -119,7 +121,7 @@ func (g *GOiTunes) generateMetadataPlist(bundleId string, songPlist model.SongPl
 		songPlist.MetaData.Rating.Rank,
 		songPlist.MetaData.Rating.System,
 		songPlist.MetaData.ReleaseDate,
-		g.getStore().StoreFront.Int(),
+		storeFront,
 		songPlist.MetaData.SoftwareIcon57x57URL,
 		softwareSupportedDeviceIds,
 		bundleId,

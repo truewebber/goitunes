@@ -183,6 +183,11 @@ func GetStoreList() GeoStore {
 			StoreFront:       143480,
 			HostPrefix:       39,
 		},
+		"ar": &ItunesStore{
+			XAppleStoreFront: "143505-2,32",
+			StoreFront:       143505,
+			HostPrefix:       11,
+		},
 	}
 }
 

@@ -14,6 +14,8 @@ import (
 
 	"github.com/groob/plist"
 	"github.com/mgutz/logxi/v1"
+
+	"github.com/Truewebber/goitunes/helper"
 	"github.com/Truewebber/goitunes/model"
 	"github.com/Truewebber/goitunes/store"
 )
@@ -199,19 +201,22 @@ func (g *GOiTunes) GetTop200Applications(
 		price := float64(0)
 		currencyLabel := ""
 		versionCode := 0
+		version := ""
 
 		if appInfo, ok := topResults[adamId]; ok {
 			bundleId = appInfo.BundleID
 			rating = appInfo.UserRating.Value
 			price = appInfo.Offers[0].Price
-			currencyLabel = getCurrency(price, appInfo.Offers[0].PriceFormatted)
+			currencyLabel = helper.GetCurrency(price, appInfo.Offers[0].PriceFormatted)
 			versionCode = appInfo.Offers[0].Version.ExternalID
+			version = appInfo.Offers[0].Version.Display
 		} else if appInfo, ok := infoResults[adamId]; ok {
 			bundleId = appInfo.BundleID
 			rating = appInfo.UserRating.Value
 			price = appInfo.Offers[0].Price
-			currencyLabel = getCurrency(price, appInfo.Offers[0].PriceFormatted)
+			currencyLabel = helper.GetCurrency(price, appInfo.Offers[0].PriceFormatted)
 			versionCode = appInfo.Offers[0].Version.ExternalID
+			version = appInfo.Offers[0].Version.Display
 		}
 
 		out = append(out, model.TopAppItemResponse{
@@ -222,6 +227,7 @@ func (g *GOiTunes) GetTop200Applications(
 			Price:         price,
 			CurrencyLabel: currencyLabel,
 			VersionCode:   int64(versionCode),
+			Version:       version,
 		})
 	}
 
@@ -289,7 +295,7 @@ func (g *GOiTunes) GetTop1500Applications(
 		buyParams, _ := url.ParseQuery(item.BuyData.ActionParams)
 		paramPrice, _ := strconv.ParseInt(buyParams.Get("price"), 10, 64)
 
-		currencyLabel := getCurrency(float64(paramPrice), item.ButtonText)
+		currencyLabel := helper.GetCurrency(float64(paramPrice), item.ButtonText)
 		price := float64(paramPrice) / 1000
 
 		versionCode, err := strconv.ParseInt(item.BuyData.VersionID, 10, 64)
@@ -495,7 +501,8 @@ func (g *GOiTunes) Login(password string) (*model.AuthResponse, error) {
 		return nil, errors.New("Password can not be empty")
 	}
 
-	req, err := http.NewRequest("POST", g.getLoginUrl(), g.generateLoginBody(password))
+	req, err := http.NewRequest("POST", g.getLoginUrl(),
+		helper.GenerateLoginBody(password, g.MachineName, g.GUID, g.AppleId))
 	if err != nil {
 		return nil, fmt.Errorf("Error create request authorization iTunes, error: %s", err.Error())
 	}
@@ -535,7 +542,7 @@ func (g *GOiTunes) Login(password string) (*model.AuthResponse, error) {
 }
 
 func (g *GOiTunes) BuyApplication(adamId string, extVersionId int) (*model.IPA, error) {
-	obj, err := g.buy(adamId, extVersionId, pricingParametersBuy)
+	obj, err := g.buy(adamId, extVersionId, helper.PricingParametersBuy)
 	if err != nil {
 		return nil, err
 	}
@@ -590,7 +597,8 @@ func (g *GOiTunes) BuyApplication(adamId string, extVersionId int) (*model.IPA, 
 	}
 
 	//iTunesMetadata.plist
-	iTunesMetadata := g.generateMetadataPlist(bundleId, obj.SongPlist[0])
+	iTunesMetadata := helper.GenerateMetadataPlist(bundleId, obj.SongPlist[0],
+		g.getStore().XAppleStoreFront, g.getStore().StoreFront.Int())
 
 	return &model.IPA{
 		Url: obj.SongPlist[0].Url,
@@ -608,7 +616,8 @@ func (g *GOiTunes) BuyApplication(adamId string, extVersionId int) (*model.IPA, 
 
 //private methods
 func (g *GOiTunes) buy(adamId string, extVersionId int, pricing string) (*model.BuyProductResponse, error) {
-	req, err := http.NewRequest("POST", g.getBuyProductUrl(), g.generateBuyProductBody(adamId, extVersionId, pricing))
+	req, err := http.NewRequest("POST", g.getBuyProductUrl(),
+		helper.GenerateBuyProductBody(adamId, extVersionId, pricing, g.GUID, g.Kbsync, g.MachineName))
 	if err != nil {
 		return nil, fmt.Errorf("Error create request buyProduct iTunes, error: %s", err.Error())
 	}

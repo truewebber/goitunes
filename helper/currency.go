@@ -1,11 +1,11 @@
-package goitunes
+package helper
 
 import (
 	"regexp"
 	"strings"
 )
 
-func getCurrency(price float64, priceFormatted string) string {
+func GetCurrency(price float64, priceFormatted string) string {
 	var currency string
 	if price != 0 {
 		rgx := regexp.MustCompile("\\d")

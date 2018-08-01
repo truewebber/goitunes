@@ -5,7 +5,7 @@ import (
 	"testing"
 
 	"github.com/Truewebber/goitunes/model"
-	"github.com/Truewebber/store"
+	"github.com/Truewebber/goitunes/store"
 )
 
 var (
@@ -29,14 +29,14 @@ var (
 func init() {
 	var err error
 	goitunes, err = NewGOiTunes(
-		"truewebber@apptica.com",
+		"{APPLE_ID}",
 		"",
 		kbsync,
 		"",
 		"RU",
 		"9801A7A4ED7B",
 		"iTunes/10.6 (Windows; Microsoft Windows 7 x64 Ultimate Edition Service Pack 1 (Build 7601)) AppleWebKit/534.54.16",
-		"m83",
+		"{HOSTNAME}",
 	)
 
 	if err != nil {
@@ -135,7 +135,7 @@ func TestDownload(t *testing.T) {
 	bundle := "com.zynga.crosswordswithfriends"
 
 	var err error
-	AuthResp, err = goitunes.Login("Apptica41")
+	AuthResp, err = goitunes.Login("{PASSWORD}")
 	if err != nil {
 		t.Errorf("Can't login iTunes, error: %s", err.Error())
 

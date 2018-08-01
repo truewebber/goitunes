@@ -1,4 +1,4 @@
-package goitunes
+package helper
 
 import (
 	"fmt"
@@ -41,24 +41,26 @@ var (
 )
 
 const (
-	pricingParametersBuy        = "STDQ"
-	pricingParametersReDownload = "STDRDL"
+	PricingParametersBuy        = "STDQ"
+	PricingParametersReDownload = "STDRDL"
 )
 
-func (g *GOiTunes) generateBuyProductBody(adamId string, extVersionId int, pricingParameters string) *strings.Reader {
+func GenerateBuyProductBody(
+	adamId string, extVersionId int, pricingParameters string, guid string, kbsync string, machineName string,
+) *strings.Reader {
 	unixAppleTime := time.Now().UnixNano() / 1000000
 
 	rebuy := "false"
-	if pricingParameters == pricingParametersReDownload {
+	if pricingParameters == PricingParametersReDownload {
 		rebuy = "true"
 	}
 
 	body := fmt.Sprintf(
 		BuyTemplate,
 		extVersionId,
-		g.GUID,
-		g.Kbsync,
-		g.MachineName,
+		guid,
+		kbsync,
+		machineName,
 		unixAppleTime,
 		pricingParameters,
 		rebuy,
@@ -68,14 +70,14 @@ func (g *GOiTunes) generateBuyProductBody(adamId string, extVersionId int, prici
 	return strings.NewReader(body)
 }
 
-func (g *GOiTunes) generateLoginBody(password string) *strings.Reader {
+func GenerateLoginBody(password string, machineName string, guid string, appleId string) *strings.Reader {
 	params := url.Values{
-		"matchineName":  {g.MachineName},
+		"matchineName":  {machineName},
 		"why":           {"signin"},
 		"attempt":       {"1"},
 		"createSession": {"true"},
-		"guid":          {g.GUID},
-		"appleId":       {g.AppleId},
+		"guid":          {guid},
+		"appleId":       {appleId},
 		"password":      {password},
 	}
 

@@ -1,4 +1,4 @@
-package goitunes
+package helper
 
 import (
 	"fmt"
@@ -8,7 +8,15 @@ import (
 	"os/exec"
 )
 
-func (g *GOiTunes) getDir(path string) error {
+type (
+	IPAFactory struct {}
+)
+
+func NewIPAFactory() *IPAFactory {
+	return &IPAFactory{}
+}
+
+func (i *IPAFactory) getDir(path string) error {
 	if _, err := os.Stat(path); os.IsNotExist(err) {
 		return nil
 	}
@@ -27,7 +35,7 @@ func (g *GOiTunes) getDir(path string) error {
 }
 
 //If file path empty, then create uniq temp fileName in is temp
-func (g *GOiTunes) writeToFile(filePath string, file io.Reader) (string, error) {
+func (i *IPAFactory) writeToFile(filePath string, file io.Reader) (string, error) {
 	var fileDestPath string
 	if len(filePath) == 0 {
 		tmpFile, _ := ioutil.TempFile("", "goitunes_files_")
@@ -50,7 +58,7 @@ func (g *GOiTunes) writeToFile(filePath string, file io.Reader) (string, error) 
 	return fileDestPath, nil
 }
 
-func (g *GOiTunes) unzipToTmpDir(filePath string) (string, error) {
+func (i *IPAFactory) unzipToTmpDir(filePath string) (string, error) {
 	if _, err := os.Stat(filePath); os.IsNotExist(err) {
 		return "", fmt.Errorf("Source file is not exists, filepath: %s, error: %s", filePath, err.Error())
 	}
@@ -66,7 +74,7 @@ func (g *GOiTunes) unzipToTmpDir(filePath string) (string, error) {
 	return unzipDirPath, nil
 }
 
-func (g *GOiTunes) zipPath(filePath string, sourcePath string) (string, error) {
+func (i *IPAFactory) zipPath(filePath string, sourcePath string) (string, error) {
 	var zipFilePath string
 	if len(filePath) == 0 {
 		tmpFile, _ := ioutil.TempFile("", "goitunes_zip_")
@@ -84,7 +92,7 @@ func (g *GOiTunes) zipPath(filePath string, sourcePath string) (string, error) {
 	return zipFilePath, nil
 }
 
-func (g *GOiTunes) removeAll(elements []string) {
+func (i *IPAFactory) removeAll(elements []string) {
 	for _, elem := range elements {
 		fi, err := os.Stat(elem)
 		if err != nil {

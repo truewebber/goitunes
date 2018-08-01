@@ -42,6 +42,7 @@ type (
 		Rating        float64
 		Price         float64
 		CurrencyLabel string
+		Version       string
 		VersionCode   int64
 	}
 
