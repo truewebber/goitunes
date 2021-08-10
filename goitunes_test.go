@@ -2,41 +2,38 @@ package goitunes
 
 import (
 	"fmt"
+	"os"
 	"testing"
 
-	"github.com/Truewebber/goitunes/model"
-	"github.com/Truewebber/goitunes/store"
+	"github.com/truewebber/goitunes/model"
+	"github.com/truewebber/goitunes/store"
 )
 
 var (
 	goitunes *GOiTunes
 	AuthResp *model.AuthResponse
+)
 
-	kbsync = `AAQAA5nfBFJ2pQ2dGNcv4hSmXBcv2FaCiqIO6NM5sXeGnZOyD82E1lxsvvhHihO6Xc5r
-	CvW/7AMmKJeW3EnkBU6EaxHEYHHsAEu1g3+mTTGxroaKuQfRLsGz+UUImTDlvBr0xhwm
-	xsr7+t8o4xIqeRhZZzlBaWjeGRFRPQ5JmJNlqyyH2ByxhyFwqhJhlQsiPK5qt0iymdP2
-	KFm0L1b+FvDexd9pDbYGIXDNoqFZrgxtUQkdd0RfgPdZi5QB2DWePkrUnoBF02OEqg81
-	BCnh8EWPA+VTCkEbF9mi58rXvXQXZlR66vFmS7o/MdmjrFrRdQEV10ScVTwQbLls26EZ
-	FW77Lql5tPSCwvkVRqREOCGiYOdyrTjvH7b69G3NUg3ZyVwZz8I72tioGNHVzsEaEtvC
-	WcID3ZD/i//7BoUuwYTwausTLr3YHh6HP2IYKXhZe116ZS8wf6mn1sfFSW/vxEHfqIJN
-	xnVp/VMtbUJhCN2k94LiEk89IKEcdcvX/s9S8UaSHdPJH/qCEcKdUBoM5wysDsQsORI3
-	C0DtRbU3BSiqZtIt/AGVtiQGnZBoVNiHjgNO5cn3Z1NHva0w/VBO7He0gE69By2PA2AJ
-	BLIjVoiZj62w3GuCqbFEO2y6xmYnK34EzK75J3SUv6Tpgxp3rs4R4z4p1/lGuqoapRbe
-	Np2SVjoSSxXI0wCoOZzKe0TFgSYp0vHboz+vpxxK7565QWc47C5H3S8ixXJ0xJnTbIjv
-	R1nrEJ95DbNxPpnW5jgZRT/s71nkNUoDBlH6S1byKHClrIaKuMLmYTotFywkwt4P9lup`
+var (
+	testKbsync      = os.Getenv("kbsync")
+	testPassword    = os.Getenv("password")
+	testAppleID     = os.Getenv("appleID")
+	testMachineName = os.Getenv("machineName")
+	testGuid        = os.Getenv("guid")
+	testGeo         = os.Getenv("geo")
 )
 
 func init() {
 	var err error
 	goitunes, err = NewGOiTunes(
-		"{APPLE_ID}",
+		testAppleID,
 		"",
-		kbsync,
+		testKbsync,
 		"",
-		"RU",
-		"9801A7A4ED7B",
+		testGeo,
+		testGuid,
 		"iTunes/10.6 (Windows; Microsoft Windows 7 x64 Ultimate Edition Service Pack 1 (Build 7601)) AppleWebKit/534.54.16",
-		"{HOSTNAME}",
+		testMachineName,
 	)
 
 	if err != nil {
@@ -109,7 +106,7 @@ func TestGetApplicationInfoByBundleId(t *testing.T) {
 
 func TestLogin(t *testing.T) {
 	var err error
-	AuthResp, err = goitunes.Login("Apptica41")
+	AuthResp, err = goitunes.Login(testPassword)
 	if err != nil {
 		t.Errorf("Can't login iTunes, error: %s", err.Error())
 
@@ -135,7 +132,7 @@ func TestDownload(t *testing.T) {
 	bundle := "com.zynga.crosswordswithfriends"
 
 	var err error
-	AuthResp, err = goitunes.Login("{PASSWORD}")
+	AuthResp, err = goitunes.Login(testPassword)
 	if err != nil {
 		t.Errorf("Can't login iTunes, error: %s", err.Error())
 

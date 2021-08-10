@@ -3,7 +3,7 @@ package helper
 import (
 	"fmt"
 
-	"github.com/Truewebber/goitunes/model"
+	"github.com/truewebber/goitunes/model"
 )
 
 var (
