@@ -8,7 +8,7 @@ import (
 	"net/url"
 	"strings"
 
-	"github.com/groob/plist"
+	"github.com/micromdm/plist"
 
 	"github.com/truewebber/goitunes/internal/domain/valueobject"
 	"github.com/truewebber/goitunes/internal/infrastructure/appstore/model"

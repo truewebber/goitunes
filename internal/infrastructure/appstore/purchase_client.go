@@ -11,7 +11,7 @@ import (
 	"strings"
 	"time"
 
-	"github.com/groob/plist"
+	"github.com/micromdm/plist"
 
 	"github.com/truewebber/goitunes/internal/domain/entity"
 	"github.com/truewebber/goitunes/internal/domain/repository"
