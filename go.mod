@@ -1,4 +1,4 @@
-module github.com/truewebber/goitunes
+module github.com/truewebber/goitunes/v2
 
 go 1.21
 
