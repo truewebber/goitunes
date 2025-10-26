@@ -3,7 +3,7 @@ package repository
 import (
 	"context"
 
-	"github.com/truewebber/goitunes/internal/domain/valueobject"
+	"github.com/truewebber/goitunes/v2/internal/domain/valueobject"
 )
 
 // AuthRepository defines the interface for authentication operations
@@ -20,4 +20,3 @@ type AuthResponse struct {
 	CreditBalance   string
 	FreeSongBalance string
 }
-

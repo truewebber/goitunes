@@ -3,7 +3,7 @@ package repository
 import (
 	"context"
 
-	"github.com/truewebber/goitunes/internal/domain/entity"
+	"github.com/truewebber/goitunes/v2/internal/domain/entity"
 )
 
 // ApplicationRepository defines the interface for application data access
@@ -23,4 +23,3 @@ type ApplicationRepository interface {
 	// GetOverallRating retrieves overall rating information
 	GetOverallRating(ctx context.Context, adamID string) (rating float64, count int, err error)
 }
-

@@ -1,8 +1,6 @@
 package entity
 
-import (
-	"time"
-)
+import "time"
 
 // Application represents an iOS application in the App Store
 type Application struct {
@@ -150,4 +148,3 @@ func (a *Application) IsUniversal() bool {
 	}
 	return hasIPhone && hasIPad
 }
-

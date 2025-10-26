@@ -3,8 +3,8 @@ package goitunes
 import (
 	"context"
 
-	"github.com/truewebber/goitunes/internal/application/dto"
-	"github.com/truewebber/goitunes/internal/application/usecase"
+	"github.com/truewebber/goitunes/v2/internal/application/dto"
+	"github.com/truewebber/goitunes/v2/internal/application/usecase"
 )
 
 // ChartType represents the type of chart

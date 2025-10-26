@@ -1,8 +1,6 @@
 package valueobject
 
-import (
-	"fmt"
-)
+import "fmt"
 
 // Device represents a device configuration for App Store requests
 type Device struct {
@@ -52,4 +50,3 @@ var (
 	UserAgentDownload = "itunesstored/1.0 iOS/9.0 model/iPhone6,1 hwp/s5l8960x build/13A344 (6; dt:89)"
 	UserAgentWindows  = "iTunes/10.6 (Windows; Microsoft Windows 7 x64 Ultimate Edition Service Pack 1 (Build 7601)) AppleWebKit/534.54.16"
 )
-

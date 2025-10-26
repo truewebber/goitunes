@@ -5,7 +5,7 @@ import (
 	"fmt"
 	"log"
 
-	"github.com/truewebber/goitunes/pkg/goitunes"
+	"github.com/truewebber/goitunes/v2/pkg/goitunes"
 )
 
 func main() {
@@ -76,4 +76,3 @@ func main() {
 	fmt.Printf("Overall Rating: %.2f\n", overallRating.Rating)
 	fmt.Printf("Overall Rating Count: %d\n", overallRating.RatingCount)
 }
-

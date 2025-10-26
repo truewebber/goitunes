@@ -10,12 +10,12 @@ import (
 	"strings"
 	"time"
 
-	"github.com/truewebber/goitunes/internal/domain/entity"
-	"github.com/truewebber/goitunes/internal/domain/service"
-	"github.com/truewebber/goitunes/internal/domain/valueobject"
-	"github.com/truewebber/goitunes/internal/infrastructure/appstore/model"
-	"github.com/truewebber/goitunes/internal/infrastructure/config"
-	infrahttp "github.com/truewebber/goitunes/internal/infrastructure/http"
+	"github.com/truewebber/goitunes/v2/internal/domain/entity"
+	"github.com/truewebber/goitunes/v2/internal/domain/service"
+	"github.com/truewebber/goitunes/v2/internal/domain/valueobject"
+	"github.com/truewebber/goitunes/v2/internal/infrastructure/appstore/model"
+	"github.com/truewebber/goitunes/v2/internal/infrastructure/config"
+	infrahttp "github.com/truewebber/goitunes/v2/internal/infrastructure/http"
 )
 
 // ApplicationClient implements ApplicationRepository interface
@@ -300,4 +300,3 @@ func (c *ApplicationClient) mapToEntity(item model.AppItemResponse) *entity.Appl
 
 	return app
 }
-

@@ -1,8 +1,6 @@
 package valueobject
 
-import (
-	"testing"
-)
+import "testing"
 
 func TestNewStore(t *testing.T) {
 	tests := []struct {
@@ -86,4 +84,3 @@ func TestStore_Equals(t *testing.T) {
 		t.Error("Store should not equal nil")
 	}
 }
-

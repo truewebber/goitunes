@@ -1,8 +1,6 @@
 package http
 
-import (
-	"net/http"
-)
+import "net/http"
 
 // Client is an interface for HTTP client operations
 type Client interface {
@@ -25,4 +23,3 @@ func NewDefaultClient() *DefaultClient {
 func (c *DefaultClient) Do(req *http.Request) (*http.Response, error) {
 	return c.client.Do(req)
 }
-

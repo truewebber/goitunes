@@ -1,8 +1,8 @@
 package goitunes
 
 import (
-	"github.com/truewebber/goitunes/internal/domain/valueobject"
-	infrahttp "github.com/truewebber/goitunes/internal/infrastructure/http"
+	"github.com/truewebber/goitunes/v2/internal/domain/valueobject"
+	infrahttp "github.com/truewebber/goitunes/v2/internal/infrastructure/http"
 )
 
 // Option is a functional option for configuring the Client
@@ -50,4 +50,3 @@ func WithDevice(guid, machineName, userAgent string) Option {
 		return nil
 	}
 }
-

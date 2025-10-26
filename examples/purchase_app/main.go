@@ -6,7 +6,7 @@ import (
 	"log"
 	"os"
 
-	"github.com/truewebber/goitunes/pkg/goitunes"
+	"github.com/truewebber/goitunes/v2/pkg/goitunes"
 )
 
 func main() {
@@ -56,7 +56,7 @@ func main() {
 	// Get application info first
 	bundleID := "com.example.app" // Replace with actual bundle ID
 	fmt.Printf("\n=== Getting application info for %s ===\n", bundleID)
-	
+
 	apps, err := client.Applications().GetByBundleID(ctx, bundleID)
 	if err != nil {
 		log.Fatalf("Failed to get app info: %v", err)
@@ -104,4 +104,3 @@ func main() {
 	fmt.Println("4. Inject Metadata into the IPA (iTunesMetadata.plist)")
 	fmt.Println("5. The application can now be installed")
 }
-

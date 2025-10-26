@@ -3,19 +3,19 @@ package goitunes
 import (
 	"fmt"
 
-	"github.com/truewebber/goitunes/internal/application/usecase"
-	"github.com/truewebber/goitunes/internal/domain/valueobject"
-	"github.com/truewebber/goitunes/internal/infrastructure/appstore"
-	"github.com/truewebber/goitunes/internal/infrastructure/config"
-	infrahttp "github.com/truewebber/goitunes/internal/infrastructure/http"
+	"github.com/truewebber/goitunes/v2/internal/application/usecase"
+	"github.com/truewebber/goitunes/v2/internal/domain/valueobject"
+	"github.com/truewebber/goitunes/v2/internal/infrastructure/appstore"
+	"github.com/truewebber/goitunes/v2/internal/infrastructure/config"
+	infrahttp "github.com/truewebber/goitunes/v2/internal/infrastructure/http"
 )
 
 // Client is the main entry point for the goitunes library
 type Client struct {
-	store        *valueobject.Store
-	httpClient   infrahttp.Client
-	credentials  *valueobject.Credentials
-	device       *valueobject.Device
+	store         *valueobject.Store
+	httpClient    infrahttp.Client
+	credentials   *valueobject.Credentials
+	device        *valueobject.Device
 	storeRegistry *config.StoreRegistry
 
 	// Repository implementations
@@ -34,7 +34,7 @@ type Client struct {
 // New creates a new goitunes client for the specified region
 func New(region string, opts ...Option) (*Client, error) {
 	storeRegistry := config.NewStoreRegistry()
-	
+
 	store, err := storeRegistry.GetStore(region)
 	if err != nil {
 		return nil, fmt.Errorf("%w: %s", ErrUnsupportedRegion, region)
@@ -65,7 +65,7 @@ func New(region string, opts ...Option) (*Client, error) {
 	// Initialize repositories
 	client.appRepo = appstore.NewApplicationClient(client.httpClient, client.store)
 	client.chartRepo = appstore.NewChartClient(client.httpClient, client.store, client.appRepo)
-	
+
 	if client.credentials != nil {
 		client.authRepo = appstore.NewAuthClient(client.httpClient, client.store, client.device)
 		client.purchaseRepo = appstore.NewPurchaseClient(
@@ -84,14 +84,14 @@ func New(region string, opts ...Option) (*Client, error) {
 		getInfoUseCase:   usecase.NewGetApplicationInfo(client.appRepo),
 		getRatingUseCase: usecase.NewGetRating(client.appRepo),
 	}
-	
+
 	if client.authRepo != nil {
 		client.authService = &AuthService{
 			useCase: usecase.NewAuthenticate(client.authRepo),
 			client:  client,
 		}
 	}
-	
+
 	if client.purchaseRepo != nil {
 		client.purchaseService = &PurchaseService{
 			useCase: usecase.NewPurchaseApplication(client.purchaseRepo),
@@ -146,4 +146,3 @@ func (c *Client) IsAuthenticated() bool {
 func (c *Client) CanPurchase() bool {
 	return c.credentials != nil && c.credentials.CanPurchase()
 }
-

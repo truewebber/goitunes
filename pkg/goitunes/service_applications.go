@@ -3,8 +3,8 @@ package goitunes
 import (
 	"context"
 
-	"github.com/truewebber/goitunes/internal/application/dto"
-	"github.com/truewebber/goitunes/internal/application/usecase"
+	"github.com/truewebber/goitunes/v2/internal/application/dto"
+	"github.com/truewebber/goitunes/v2/internal/application/usecase"
 )
 
 // ApplicationService provides methods for retrieving application information
@@ -76,4 +76,3 @@ func (s *ApplicationService) GetOverallRating(ctx context.Context, adamID string
 
 	return s.getRatingUseCase.Execute(ctx, req)
 }
-

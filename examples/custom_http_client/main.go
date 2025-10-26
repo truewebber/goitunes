@@ -7,7 +7,7 @@ import (
 	"net/http"
 	"time"
 
-	"github.com/truewebber/goitunes/pkg/goitunes"
+	"github.com/truewebber/goitunes/v2/pkg/goitunes"
 )
 
 // RetryHTTPClient implements a custom HTTP client with retry logic

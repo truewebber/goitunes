@@ -1,8 +1,6 @@
 package valueobject
 
-import (
-	"fmt"
-)
+import "fmt"
 
 // Credentials represents authentication credentials for App Store
 type Credentials struct {
@@ -85,4 +83,3 @@ func (c *Credentials) Equals(other *Credentials) bool {
 		c.dsid == other.dsid &&
 		c.kbsync == other.kbsync
 }
-

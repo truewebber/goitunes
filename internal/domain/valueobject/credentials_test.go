@@ -1,8 +1,6 @@
 package valueobject
 
-import (
-	"testing"
-)
+import "testing"
 
 func TestNewCredentials(t *testing.T) {
 	appleID := "test@example.com"
@@ -118,4 +116,3 @@ func TestCredentials_Equals(t *testing.T) {
 		t.Error("Credentials should not equal nil")
 	}
 }
-

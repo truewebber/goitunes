@@ -4,8 +4,8 @@ import (
 	"context"
 	"fmt"
 
-	"github.com/truewebber/goitunes/internal/application/dto"
-	"github.com/truewebber/goitunes/internal/domain/repository"
+	"github.com/truewebber/goitunes/v2/internal/application/dto"
+	"github.com/truewebber/goitunes/v2/internal/domain/repository"
 )
 
 // GetRating retrieves rating information for an application
@@ -41,4 +41,3 @@ func (uc *GetRating) Execute(ctx context.Context, req dto.GetRatingRequest) (*dt
 		RatingCount: count,
 	}, nil
 }
-

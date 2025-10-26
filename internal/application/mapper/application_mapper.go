@@ -1,8 +1,8 @@
 package mapper
 
 import (
-	"github.com/truewebber/goitunes/internal/application/dto"
-	"github.com/truewebber/goitunes/internal/domain/entity"
+	"github.com/truewebber/goitunes/v2/internal/application/dto"
+	"github.com/truewebber/goitunes/v2/internal/domain/entity"
 )
 
 // ApplicationMapper handles mapping between domain entities and DTOs
@@ -81,4 +81,3 @@ func (m *ApplicationMapper) DownloadInfoToDTO(info *entity.DownloadInfo) dto.Dow
 		FileSize:    info.FileSize(),
 	}
 }
-

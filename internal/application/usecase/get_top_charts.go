@@ -4,10 +4,10 @@ import (
 	"context"
 	"fmt"
 
-	"github.com/truewebber/goitunes/internal/application/dto"
-	"github.com/truewebber/goitunes/internal/application/mapper"
-	"github.com/truewebber/goitunes/internal/domain/entity"
-	"github.com/truewebber/goitunes/internal/domain/repository"
+	"github.com/truewebber/goitunes/v2/internal/application/dto"
+	"github.com/truewebber/goitunes/v2/internal/application/mapper"
+	"github.com/truewebber/goitunes/v2/internal/domain/entity"
+	"github.com/truewebber/goitunes/v2/internal/domain/repository"
 )
 
 // GetTopCharts retrieves top charts based on the request
@@ -81,4 +81,3 @@ func (uc *GetTopCharts) parseChartType(chartType string) entity.ChartType {
 		return entity.ChartTypeTopFree
 	}
 }
-

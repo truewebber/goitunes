@@ -9,13 +9,13 @@ import (
 	"net/url"
 	"strconv"
 
-	"github.com/truewebber/goitunes/internal/domain/entity"
-	"github.com/truewebber/goitunes/internal/domain/repository"
-	"github.com/truewebber/goitunes/internal/domain/service"
-	"github.com/truewebber/goitunes/internal/domain/valueobject"
-	"github.com/truewebber/goitunes/internal/infrastructure/appstore/model"
-	"github.com/truewebber/goitunes/internal/infrastructure/config"
-	infrahttp "github.com/truewebber/goitunes/internal/infrastructure/http"
+	"github.com/truewebber/goitunes/v2/internal/domain/entity"
+	"github.com/truewebber/goitunes/v2/internal/domain/repository"
+	"github.com/truewebber/goitunes/v2/internal/domain/service"
+	"github.com/truewebber/goitunes/v2/internal/domain/valueobject"
+	"github.com/truewebber/goitunes/v2/internal/infrastructure/appstore/model"
+	"github.com/truewebber/goitunes/v2/internal/infrastructure/config"
+	infrahttp "github.com/truewebber/goitunes/v2/internal/infrastructure/http"
 )
 
 // ChartClient implements ChartRepository interface

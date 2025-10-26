@@ -4,9 +4,9 @@ import (
 	"context"
 	"fmt"
 
-	"github.com/truewebber/goitunes/internal/application/dto"
-	"github.com/truewebber/goitunes/internal/application/mapper"
-	"github.com/truewebber/goitunes/internal/domain/repository"
+	"github.com/truewebber/goitunes/v2/internal/application/dto"
+	"github.com/truewebber/goitunes/v2/internal/application/mapper"
+	"github.com/truewebber/goitunes/v2/internal/domain/repository"
 )
 
 // PurchaseApplication handles application purchase
@@ -41,4 +41,3 @@ func (uc *PurchaseApplication) Execute(ctx context.Context, req dto.PurchaseRequ
 		DownloadInfo: uc.mapper.DownloadInfoToDTO(downloadInfo),
 	}, nil
 }
-

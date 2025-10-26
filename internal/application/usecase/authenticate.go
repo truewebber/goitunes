@@ -4,8 +4,8 @@ import (
 	"context"
 	"fmt"
 
-	"github.com/truewebber/goitunes/internal/application/dto"
-	"github.com/truewebber/goitunes/internal/domain/repository"
+	"github.com/truewebber/goitunes/v2/internal/application/dto"
+	"github.com/truewebber/goitunes/v2/internal/domain/repository"
 )
 
 // Authenticate performs user authentication
@@ -41,4 +41,3 @@ func (uc *Authenticate) Execute(ctx context.Context, req dto.AuthenticateRequest
 		Authenticated: credentials.IsAuthenticated(),
 	}, nil
 }
-

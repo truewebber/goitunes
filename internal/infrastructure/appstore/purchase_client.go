@@ -13,12 +13,12 @@ import (
 
 	"github.com/micromdm/plist"
 
-	"github.com/truewebber/goitunes/internal/domain/entity"
-	"github.com/truewebber/goitunes/internal/domain/repository"
-	"github.com/truewebber/goitunes/internal/domain/valueobject"
-	"github.com/truewebber/goitunes/internal/infrastructure/appstore/model"
-	"github.com/truewebber/goitunes/internal/infrastructure/config"
-	infrahttp "github.com/truewebber/goitunes/internal/infrastructure/http"
+	"github.com/truewebber/goitunes/v2/internal/domain/entity"
+	"github.com/truewebber/goitunes/v2/internal/domain/repository"
+	"github.com/truewebber/goitunes/v2/internal/domain/valueobject"
+	"github.com/truewebber/goitunes/v2/internal/infrastructure/appstore/model"
+	"github.com/truewebber/goitunes/v2/internal/infrastructure/config"
+	infrahttp "github.com/truewebber/goitunes/v2/internal/infrastructure/http"
 )
 
 // PurchaseClient implements PurchaseRepository interface
@@ -207,7 +207,7 @@ func (c *PurchaseClient) buildBuyBody(
 	pricingParameter repository.PricingParameter,
 ) *strings.Reader {
 	unixTime := time.Now().UnixNano() / 1000000
-	
+
 	rebuy := "false"
 	if pricingParameter == repository.PricingParameterReDownload {
 		rebuy = "true"
@@ -258,28 +258,27 @@ func (c *PurchaseClient) buildBuyBody(
 // generateMetadata generates iTunes metadata plist
 func (c *PurchaseClient) generateMetadata(song model.SongItem, bundleID string) []byte {
 	metadata := map[string]interface{}{
-		"softwareVersionBundleId": bundleID,
-		"itemId":                  song.Metadata.ItemID,
-		"itemName":                song.Metadata.ItemName,
-		"kind":                    "software",
-		"playlistName":            song.Metadata.PlaylistName,
-		"artistName":              song.Metadata.ArtistName,
-		"artistId":                song.Metadata.ArtistID,
-		"softwareIcon57x57URL":    song.Metadata.SoftwareIcon57x57URL,
-		"bundleShortVersionString": song.Metadata.BundleShortVersionString,
-		"bundleVersion":            song.Metadata.BundleVersion,
-		"genre":                    song.Metadata.Genre,
-		"genreId":                  song.Metadata.GenreID,
-		"releaseDate":              song.Metadata.ReleaseDate,
-		"copyright":                song.Metadata.Copyright,
+		"softwareVersionBundleId":           bundleID,
+		"itemId":                            song.Metadata.ItemID,
+		"itemName":                          song.Metadata.ItemName,
+		"kind":                              "software",
+		"playlistName":                      song.Metadata.PlaylistName,
+		"artistName":                        song.Metadata.ArtistName,
+		"artistId":                          song.Metadata.ArtistID,
+		"softwareIcon57x57URL":              song.Metadata.SoftwareIcon57x57URL,
+		"bundleShortVersionString":          song.Metadata.BundleShortVersionString,
+		"bundleVersion":                     song.Metadata.BundleVersion,
+		"genre":                             song.Metadata.Genre,
+		"genreId":                           song.Metadata.GenreID,
+		"releaseDate":                       song.Metadata.ReleaseDate,
+		"copyright":                         song.Metadata.Copyright,
 		"softwareVersionExternalIdentifier": song.Metadata.ExternalVersionID,
 		"softwareSupportedDeviceIds":        song.Metadata.SoftwareSupportedDeviceIDs,
-		"appleId":                          c.credentials.AppleID(),
-		"purchaseDate":                     song.PurchaseDate,
-		"storeFront":                       fmt.Sprintf("%d", c.store.StoreFront()),
+		"appleId":                           c.credentials.AppleID(),
+		"purchaseDate":                      song.PurchaseDate,
+		"storeFront":                        fmt.Sprintf("%d", c.store.StoreFront()),
 	}
 
 	data, _ := plist.Marshal(metadata)
 	return data
 }
-

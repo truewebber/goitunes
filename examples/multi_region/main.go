@@ -5,7 +5,7 @@ import (
 	"fmt"
 	"log"
 
-	"github.com/truewebber/goitunes/pkg/goitunes"
+	"github.com/truewebber/goitunes/v2/pkg/goitunes"
 )
 
 func main() {

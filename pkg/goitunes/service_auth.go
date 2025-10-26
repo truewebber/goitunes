@@ -3,10 +3,10 @@ package goitunes
 import (
 	"context"
 
-	"github.com/truewebber/goitunes/internal/application/dto"
-	"github.com/truewebber/goitunes/internal/application/usecase"
-	"github.com/truewebber/goitunes/internal/domain/valueobject"
-	"github.com/truewebber/goitunes/internal/infrastructure/appstore"
+	"github.com/truewebber/goitunes/v2/internal/application/dto"
+	"github.com/truewebber/goitunes/v2/internal/application/usecase"
+	"github.com/truewebber/goitunes/v2/internal/domain/valueobject"
+	"github.com/truewebber/goitunes/v2/internal/infrastructure/appstore"
 )
 
 // AuthService provides authentication methods
@@ -76,4 +76,3 @@ func (s *AuthService) Login(ctx context.Context, password string) (*dto.Authenti
 func (s *AuthService) IsAuthenticated() bool {
 	return s.client.IsAuthenticated()
 }
-

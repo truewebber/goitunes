@@ -3,8 +3,8 @@ package goitunes
 import (
 	"context"
 
-	"github.com/truewebber/goitunes/internal/application/dto"
-	"github.com/truewebber/goitunes/internal/application/usecase"
+	"github.com/truewebber/goitunes/v2/internal/application/dto"
+	"github.com/truewebber/goitunes/v2/internal/application/usecase"
 )
 
 // PurchaseService provides purchase and download methods
@@ -30,4 +30,3 @@ func (s *PurchaseService) Buy(
 
 	return &resp.DownloadInfo, nil
 }
-

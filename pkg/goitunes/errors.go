@@ -1,8 +1,6 @@
 package goitunes
 
-import (
-	"errors"
-)
+import "errors"
 
 var (
 	// ErrUnsupportedRegion is returned when the specified region is not supported
@@ -23,4 +21,3 @@ var (
 	// ErrInvalidRequest is returned when the request parameters are invalid
 	ErrInvalidRequest = errors.New("invalid request")
 )
-

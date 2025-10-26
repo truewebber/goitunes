@@ -10,10 +10,10 @@ import (
 
 	"github.com/micromdm/plist"
 
-	"github.com/truewebber/goitunes/internal/domain/valueobject"
-	"github.com/truewebber/goitunes/internal/infrastructure/appstore/model"
-	"github.com/truewebber/goitunes/internal/infrastructure/config"
-	infrahttp "github.com/truewebber/goitunes/internal/infrastructure/http"
+	"github.com/truewebber/goitunes/v2/internal/domain/valueobject"
+	"github.com/truewebber/goitunes/v2/internal/infrastructure/appstore/model"
+	"github.com/truewebber/goitunes/v2/internal/infrastructure/config"
+	infrahttp "github.com/truewebber/goitunes/v2/internal/infrastructure/http"
 )
 
 // AuthClient implements AuthRepository interface
@@ -46,9 +46,9 @@ func (c *AuthClient) Authenticate(
 	}
 
 	loginURL := fmt.Sprintf(config.LoginURLTemplate, c.store.HostPrefix())
-	
+
 	body := c.buildLoginBody(appleID, password)
-	
+
 	req, err := http.NewRequestWithContext(ctx, http.MethodPost, loginURL, body)
 	if err != nil {
 		return nil, fmt.Errorf("failed to create request: %w", err)
@@ -107,4 +107,3 @@ func (c *AuthClient) buildLoginBody(appleID, password string) *strings.Reader {
 
 	return strings.NewReader(params.Encode())
 }
-

@@ -3,7 +3,7 @@ package config
 import (
 	"fmt"
 
-	"github.com/truewebber/goitunes/internal/domain/valueobject"
+	"github.com/truewebber/goitunes/v2/internal/domain/valueobject"
 )
 
 // StoreRegistry manages available App Store regions
@@ -81,4 +81,3 @@ func (r *StoreRegistry) initialize() {
 		r.stores[s.region] = store
 	}
 }
-

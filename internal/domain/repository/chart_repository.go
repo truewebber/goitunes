@@ -3,7 +3,7 @@ package repository
 import (
 	"context"
 
-	"github.com/truewebber/goitunes/internal/domain/entity"
+	"github.com/truewebber/goitunes/v2/internal/domain/entity"
 )
 
 // ChartRepository defines the interface for chart data access
@@ -23,4 +23,3 @@ type ChartRepository interface {
 	// pageSize: number of items per page
 	GetTop1500(ctx context.Context, genreID string, chartType entity.ChartType, page, pageSize int) ([]*entity.ChartItem, error)
 }
-

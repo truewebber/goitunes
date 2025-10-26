@@ -6,7 +6,7 @@ import (
 	"log"
 	"os"
 
-	"github.com/truewebber/goitunes/pkg/goitunes"
+	"github.com/truewebber/goitunes/v2/pkg/goitunes"
 )
 
 func main() {
@@ -66,4 +66,3 @@ func main() {
 	fmt.Printf("Region: %s\n", client.Region())
 	fmt.Printf("Supported regions: %v\n", client.SupportedRegions())
 }
-

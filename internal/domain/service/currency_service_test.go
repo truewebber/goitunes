@@ -1,8 +1,6 @@
 package service
 
-import (
-	"testing"
-)
+import "testing"
 
 func TestCurrencyService_ExtractCurrency(t *testing.T) {
 	service := NewCurrencyService()
@@ -58,4 +56,3 @@ func TestCurrencyService_FormatPrice(t *testing.T) {
 		})
 	}
 }
-

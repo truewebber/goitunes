@@ -1,8 +1,6 @@
 package dto
 
-import (
-	"time"
-)
+import "time"
 
 // ApplicationDTO represents application data transfer object
 type ApplicationDTO struct {
@@ -48,4 +46,3 @@ type DownloadInfoDTO struct {
 	VersionID   int64             `json:"versionId"`
 	FileSize    int64             `json:"fileSize"`
 }
-

@@ -4,10 +4,10 @@ import (
 	"context"
 	"fmt"
 
-	"github.com/truewebber/goitunes/internal/application/dto"
-	"github.com/truewebber/goitunes/internal/application/mapper"
-	"github.com/truewebber/goitunes/internal/domain/entity"
-	"github.com/truewebber/goitunes/internal/domain/repository"
+	"github.com/truewebber/goitunes/v2/internal/application/dto"
+	"github.com/truewebber/goitunes/v2/internal/application/mapper"
+	"github.com/truewebber/goitunes/v2/internal/domain/entity"
+	"github.com/truewebber/goitunes/v2/internal/domain/repository"
 )
 
 // GetApplicationInfo retrieves application information
@@ -47,4 +47,3 @@ func (uc *GetApplicationInfo) Execute(ctx context.Context, req dto.GetApplicatio
 		Applications: uc.mapper.ToDTOList(apps),
 	}, nil
 }
-

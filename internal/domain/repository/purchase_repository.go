@@ -3,7 +3,7 @@ package repository
 import (
 	"context"
 
-	"github.com/truewebber/goitunes/internal/domain/entity"
+	"github.com/truewebber/goitunes/v2/internal/domain/entity"
 )
 
 // PurchaseRepository defines the interface for purchase and download operations
@@ -23,4 +23,3 @@ const (
 	PricingParameterBuy        PricingParameter = "STDQ"
 	PricingParameterReDownload PricingParameter = "STDRDL"
 )
-
