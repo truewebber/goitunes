@@ -8,7 +8,7 @@ Go library for Apple App Store API.
 ## Installation
 
 ```bash
-go get github.com/truewebber/goitunes
+go get github.com/truewebber/goitunes/v2
 ```
 
 ## Quick Start
