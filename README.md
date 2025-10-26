@@ -356,6 +356,11 @@ Password tokens and DSID are temporary and will expire. Re-authentication may be
 ### Re-downloads
 Re-downloading already purchased apps may require a different kbsync certificate (STDRDL vs STDQ).
 
+## Documentation
+
+- **[kbsync Guide](KBSYNC.md)** - What is kbsync, where it's used, and how to obtain it
+- **[Purchase Parameters Guide](PURCHASE_PARAMETERS.md)** - Detailed documentation of all parameters required for purchasing applications
+
 ## Architecture
 
 The library is built with Clean Architecture principles:
