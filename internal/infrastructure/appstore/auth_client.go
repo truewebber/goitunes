@@ -45,8 +45,30 @@ func (c *AuthClient) Authenticate(
 		return nil, ErrEmptyPassword
 	}
 
-	loginURL := fmt.Sprintf(config.LoginURLTemplate, c.store.HostPrefix())
+	authResp, err := c.performAuthRequest(ctx, appleID, password)
+	if err != nil {
+		return nil, err
+	}
 
+	//nolint:gocritic // err is already declared, using = to avoid shadow
+	if err = c.validateAuthResponse(authResp); err != nil {
+		return nil, err
+	}
+
+	credentials, err := valueobject.NewCredentialsWithTokens(appleID, authResp.PasswordToken, authResp.DSID)
+	if err != nil {
+		return nil, fmt.Errorf("failed to create credentials: %w", err)
+	}
+
+	return credentials, nil
+}
+
+// performAuthRequest performs the authentication HTTP request.
+func (c *AuthClient) performAuthRequest(
+	ctx context.Context,
+	appleID, password string,
+) (*model.AuthResponse, error) {
+	loginURL := fmt.Sprintf(config.LoginURLTemplate, c.store.HostPrefix())
 	body := c.buildLoginBody(appleID, password)
 
 	req, err := http.NewRequestWithContext(ctx, http.MethodPost, loginURL, body)
@@ -85,20 +107,20 @@ func (c *AuthClient) Authenticate(
 		return nil, fmt.Errorf("failed to unmarshal response: %w", err)
 	}
 
+	return &authResp, nil
+}
+
+// validateAuthResponse validates the authentication response.
+func (c *AuthClient) validateAuthResponse(authResp *model.AuthResponse) error {
 	if authResp.PasswordToken == "" {
-		return nil, ErrPasswordTokenNotFound
+		return ErrPasswordTokenNotFound
 	}
 
 	if authResp.DSID == "" {
-		return nil, ErrDSIDNotFound
+		return ErrDSIDNotFound
 	}
 
-	credentials, err := valueobject.NewCredentialsWithTokens(appleID, authResp.PasswordToken, authResp.DSID)
-	if err != nil {
-		return nil, fmt.Errorf("failed to create credentials: %w", err)
-	}
-
-	return credentials, nil
+	return nil
 }
 
 // buildLoginBody creates the request body for login.

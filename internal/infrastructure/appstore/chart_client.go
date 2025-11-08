@@ -52,6 +52,50 @@ func (c *ChartClient) GetTop200(
 		from = 1
 	}
 
+	response, err := c.fetchTop200Response(ctx, genreID, chartType, kidPrefix)
+	if err != nil {
+		return nil, err
+	}
+
+	adamIDs, limit := c.extractAdamIDsAndLimit(response, limit)
+	fromToChunk := c.calculateChunkRange(from, limit, len(adamIDs))
+
+	topResults := response.StorePlatformData.Lockup.Results
+
+	infoResults, err := c.fetchMissingAppInfo(ctx, adamIDs, from, fromToChunk, topResults)
+	if err != nil {
+		return nil, err
+	}
+
+	return c.buildChartItems(adamIDs, from, fromToChunk, topResults, infoResults, chartType), nil
+}
+
+// GetTop1500 retrieves up to 1500 applications.
+func (c *ChartClient) GetTop1500(
+	ctx context.Context,
+	genreID string,
+	chartType entity.ChartType,
+	page, pageSize int,
+) ([]*entity.ChartItem, error) {
+	response, err := c.fetchTop1500Response(ctx, genreID, chartType, page, pageSize)
+	if err != nil {
+		return nil, err
+	}
+
+	if len(response) != 1 {
+		return nil, ErrUnexpectedResponseStructure
+	}
+
+	return c.buildTop1500ChartItems(&response[0], page, pageSize, chartType), nil
+}
+
+// fetchTop200Response fetches the top 200 response from API.
+func (c *ChartClient) fetchTop200Response(
+	ctx context.Context,
+	genreID string,
+	chartType entity.ChartType,
+	kidPrefix string,
+) (*model.Top200Response, error) {
 	popID := c.chartTypeToPopID(chartType)
 
 	req, err := http.NewRequestWithContext(ctx, http.MethodGet, config.Top200AppsURL, http.NoBody)
@@ -70,7 +114,6 @@ func (c *ChartClient) GetTop200(
 	q.Add("cc", c.store.Region())
 	q.Add("l", "en")
 	req.URL.RawQuery = q.Encode()
-
 	req.Header.Add(config.HeaderUserAgent, valueobject.UserAgentTop200)
 
 	resp, err := c.httpClient.Do(req)
@@ -80,7 +123,6 @@ func (c *ChartClient) GetTop200(
 
 	defer func() {
 		if closeErr := resp.Body.Close(); closeErr != nil {
-			// Log error but don't fail the function
 			_ = closeErr
 		}
 	}()
@@ -99,80 +141,16 @@ func (c *ChartClient) GetTop200(
 		return nil, fmt.Errorf("failed to unmarshal response: %w", err)
 	}
 
-	index := response.PageData.SegmentedControl.SelectedIndex
-	adamIDs := response.PageData.SegmentedControl.Segments[index].PageData.SelectedChart.AdamIDs
-
-	if limit <= 0 {
-		limit = response.Properties.DI6TopChartsPageNumIDsPerChart
-	}
-
-	fromToChunk := from + limit - 1
-	if len(adamIDs) < fromToChunk {
-		fromToChunk = len(adamIDs)
-	}
-
-	topResults := response.StorePlatformData.Lockup.Results
-	infoResults := make(map[string]*entity.Application)
-
-	// Collect missing adamIDs
-	var needGetInfo []string
-
-	for i := from - 1; i < fromToChunk; i++ {
-		if _, ok := topResults[adamIDs[i]]; !ok {
-			needGetInfo = append(needGetInfo, adamIDs[i])
-		}
-	}
-
-	// Fetch missing application info in batches
-	for len(needGetInfo) > 0 {
-		batchSize := 50
-		if len(needGetInfo) < batchSize {
-			batchSize = len(needGetInfo)
-		}
-
-		batch := needGetInfo[:batchSize]
-		needGetInfo = needGetInfo[batchSize:]
-
-		apps, fetchErr := c.appRepo.FindByAdamID(ctx, batch)
-		if fetchErr != nil {
-			return nil, fmt.Errorf("failed to get application info: %w", fetchErr)
-		}
-
-		for _, app := range apps {
-			infoResults[app.AdamID()] = app
-		}
-	}
-
-	// Build chart items
-	chartItems := make([]*entity.ChartItem, 0, fromToChunk-from+1)
-
-	for i := from - 1; i < fromToChunk; i++ {
-		position := i + 1
-		adamID := adamIDs[i]
-
-		var app *entity.Application
-		if appInfo, ok := topResults[adamID]; ok {
-			app = c.mapAppItemToEntity(&appInfo)
-		} else if appInfo, found := infoResults[adamID]; found {
-			app = appInfo
-		} else {
-			continue
-		}
-
-		chartItem := entity.NewChartItem(app, position, chartType)
-		chartItems = append(chartItems, chartItem)
-	}
-
-	return chartItems, nil
+	return &response, nil
 }
 
-// GetTop1500 retrieves up to 1500 applications.
-func (c *ChartClient) GetTop1500(
+// fetchTop1500Response fetches the top 1500 response from API.
+func (c *ChartClient) fetchTop1500Response(
 	ctx context.Context,
 	genreID string,
 	chartType entity.ChartType,
 	page, pageSize int,
-) ([]*entity.ChartItem, error) {
+) ([]model.Top1500Response, error) {
 	popID := c.chartTypeToPopID(chartType)
 
 	q := url.Values{}
@@ -198,7 +176,6 @@ func (c *ChartClient) GetTop1500(
 
 	defer func() {
 		if closeErr := resp.Body.Close(); closeErr != nil {
-			// Log error but don't fail the function
 			_ = closeErr
 		}
 	}()
@@ -217,52 +194,200 @@ func (c *ChartClient) GetTop1500(
 		return nil, fmt.Errorf("failed to unmarshal response: %w", err)
 	}
 
-	if len(response) != 1 {
-		return nil, ErrUnexpectedResponseStructure
+	return response, nil
+}
+
+// extractAdamIDsAndLimit extracts Adam IDs and adjusts limit if needed.
+func (c *ChartClient) extractAdamIDsAndLimit(
+	response *model.Top200Response,
+	limit int,
+) ([]string, int) {
+	index := response.PageData.SegmentedControl.SelectedIndex
+	adamIDs := response.PageData.SegmentedControl.Segments[index].PageData.SelectedChart.AdamIDs
+
+	if limit <= 0 {
+		limit = response.Properties.DI6TopChartsPageNumIDsPerChart
 	}
 
-	chartItems := make([]*entity.ChartItem, 0, len(response[0].ContentData))
+	return adamIDs, limit
+}
 
-	for i := range response[0].ContentData {
-		item := &response[0].ContentData[i]
-		position := page*pageSize + i + 1
+// calculateChunkRange calculates the range for processing.
+func (c *ChartClient) calculateChunkRange(from, limit, totalLen int) int {
+	fromToChunk := from + limit - 1
+	if totalLen < fromToChunk {
+		fromToChunk = totalLen
+	}
 
-		rating, parseErr := strconv.ParseFloat(item.UserRating, 64)
-		if parseErr != nil {
-			rating = 0
+	return fromToChunk
+}
+
+// fetchMissingAppInfo fetches missing application info in batches.
+func (c *ChartClient) fetchMissingAppInfo(
+	ctx context.Context,
+	adamIDs []string,
+	from, fromToChunk int,
+	topResults map[string]model.AppItemResponse,
+) (map[string]*entity.Application, error) {
+	infoResults := make(map[string]*entity.Application)
+
+	var needGetInfo []string
+
+	for i := from - 1; i < fromToChunk; i++ {
+		if _, ok := topResults[adamIDs[i]]; !ok {
+			needGetInfo = append(needGetInfo, adamIDs[i])
+		}
+	}
+
+	const batchSize = 50
+
+	for len(needGetInfo) > 0 {
+		currentBatchSize := batchSize
+		if len(needGetInfo) < batchSize {
+			currentBatchSize = len(needGetInfo)
 		}
 
-		buyParams, parseQueryErr := url.ParseQuery(item.BuyData.ActionParams)
-		if parseQueryErr != nil {
-			buyParams = url.Values{}
+		batch := needGetInfo[:currentBatchSize]
+		needGetInfo = needGetInfo[currentBatchSize:]
+
+		apps, err := c.appRepo.FindByAdamID(ctx, batch)
+		if err != nil {
+			return nil, fmt.Errorf("failed to get application info: %w", err)
 		}
 
-		paramPrice, parsePriceErr := strconv.ParseInt(buyParams.Get("price"), 10, 64)
-		if parsePriceErr != nil {
-			paramPrice = 0
+		for _, app := range apps {
+			infoResults[app.AdamID()] = app
 		}
+	}
 
-		currency := c.currencyService.ExtractCurrency(float64(paramPrice), item.ButtonText)
+	return infoResults, nil
+}
 
-		const priceDivisor = 1000
+// buildChartItems builds chart items from available data.
+func (c *ChartClient) buildChartItems(
+	adamIDs []string,
+	from, fromToChunk int,
+	topResults map[string]model.AppItemResponse,
+	infoResults map[string]*entity.Application,
+	chartType entity.ChartType,
+) []*entity.ChartItem {
+	chartItems := make([]*entity.ChartItem, 0, fromToChunk-from+1)
 
-		price := float64(paramPrice) / priceDivisor
+	for i := from - 1; i < fromToChunk; i++ {
+		position := i + 1
+		adamID := adamIDs[i]
 
-		versionID, parseVersionErr := strconv.ParseInt(item.BuyData.VersionID, 10, 64)
-		if parseVersionErr != nil {
-			versionID = 0
+		app := c.getApplicationForChartItem(adamID, topResults, infoResults)
+		if app == nil {
+			continue
 		}
-
-		app := entity.NewApplication(item.ID, item.BuyData.BundleID, "")
-		app.SetPrice(price, currency)
-		app.SetRating(rating, 0)
-		app.SetVersion("", versionID)
 
 		chartItem := entity.NewChartItem(app, position, chartType)
 		chartItems = append(chartItems, chartItem)
 	}
 
-	return chartItems, nil
+	return chartItems
+}
+
+// getApplicationForChartItem gets application for chart item from available sources.
+func (c *ChartClient) getApplicationForChartItem(
+	adamID string,
+	topResults map[string]model.AppItemResponse,
+	infoResults map[string]*entity.Application,
+) *entity.Application {
+	if appInfo, ok := topResults[adamID]; ok {
+		return c.mapAppItemToEntity(&appInfo)
+	}
+
+	if appInfo, found := infoResults[adamID]; found {
+		return appInfo
+	}
+
+	return nil
+}
+
+// buildTop1500ChartItems builds chart items from top 1500 response data.
+func (c *ChartClient) buildTop1500ChartItems(
+	response *model.Top1500Response,
+	page, pageSize int,
+	chartType entity.ChartType,
+) []*entity.ChartItem {
+	chartItems := make([]*entity.ChartItem, 0, len(response.ContentData))
+
+	for i := range response.ContentData {
+		item := &response.ContentData[i]
+		position := page*pageSize + i + 1
+
+		app := c.buildAppFromTop1500Item(item)
+		chartItem := entity.NewChartItem(app, position, chartType)
+		chartItems = append(chartItems, chartItem)
+	}
+
+	return chartItems
+}
+
+// buildAppFromTop1500Item builds application entity from top 1500 item.
+func (c *ChartClient) buildAppFromTop1500Item(item *struct {
+	ID         string `json:"id"`
+	UserRating string `json:"userRating"`
+	ButtonText string `json:"buttonText"`
+	BuyData    struct {
+		BundleID     string `json:"bundleId"`
+		VersionID    string `json:"versionId"`
+		ActionParams string `json:"actionParams"`
+	} `json:"buyData"`
+}) *entity.Application {
+	rating := c.parseRating(item.UserRating)
+	price, currency := c.parsePrice(item.BuyData.ActionParams, item.ButtonText)
+	versionID := c.parseVersionID(item.BuyData.VersionID)
+
+	app := entity.NewApplication(item.ID, item.BuyData.BundleID, "")
+	app.SetPrice(price, currency)
+	app.SetRating(rating, 0)
+	app.SetVersion("", versionID)
+
+	return app
+}
+
+// parseRating parses rating from string.
+func (c *ChartClient) parseRating(ratingStr string) float64 {
+	rating, err := strconv.ParseFloat(ratingStr, 64)
+	if err != nil {
+		return 0
+	}
+
+	return rating
+}
+
+// parsePrice parses price and currency from buy params and button text.
+func (c *ChartClient) parsePrice(actionParams, buttonText string) (float64, string) {
+	buyParams, err := url.ParseQuery(actionParams)
+	if err != nil {
+		return 0, ""
+	}
+
+	paramPrice, err := strconv.ParseInt(buyParams.Get("price"), 10, 64)
+	if err != nil {
+		return 0, ""
+	}
+
+	currency := c.currencyService.ExtractCurrency(float64(paramPrice), buttonText)
+
+	const priceDivisor = 1000
+
+	price := float64(paramPrice) / priceDivisor
+
+	return price, currency
+}
+
+// parseVersionID parses version ID from string.
+func (c *ChartClient) parseVersionID(versionIDStr string) int64 {
+	versionID, err := strconv.ParseInt(versionIDStr, 10, 64)
+	if err != nil {
+		return 0
+	}
+
+	return versionID
 }
 
 // chartTypeToPopID converts chart type to popID.

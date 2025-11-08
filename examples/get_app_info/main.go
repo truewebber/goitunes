@@ -3,6 +3,7 @@ package main
 import (
 	"context"
 	"log"
+	"reflect"
 
 	"github.com/truewebber/goitunes/v2/pkg/goitunes"
 )
@@ -13,15 +14,25 @@ const (
 )
 
 func main() {
-	// Create a new client for the US App Store
+	client := createClient()
+	ctx := context.Background()
+
+	demonstrateGetByAdamID(ctx, client)
+	demonstrateGetByBundleID(ctx, client)
+	demonstrateGetRating(ctx, client)
+	demonstrateGetOverallRating(ctx, client)
+}
+
+func createClient() *goitunes.Client {
 	client, err := goitunes.New("us")
 	if err != nil {
 		log.Fatalf("Failed to create client: %v", err)
 	}
 
-	ctx := context.Background()
+	return client
+}
 
-	// Get application info by Adam ID
+func demonstrateGetByAdamID(ctx context.Context, client *goitunes.Client) {
 	log.Println("=== Get Application by Adam ID ===")
 
 	apps, err := client.Applications().GetByAdamID(ctx, "564177498") // Angry Birds
@@ -31,24 +42,86 @@ func main() {
 
 	if len(apps) > 0 {
 		app := apps[0]
-		log.Printf("Name: %s", app.Name)
-		log.Printf("Bundle ID: %s", app.BundleID)
-		log.Printf("Artist: %s", app.ArtistName)
-		log.Printf("Version: %s", app.Version)
-		log.Printf("Price: $%.2f %s", app.Price, app.Currency)
-		log.Printf("Rating: %.1f (%d reviews)", app.Rating, app.RatingCount)
-		log.Printf("Genre: %s", app.GenreName)
-		log.Printf("File Size: %.2f MB", float64(app.FileSize)/bytesPerMB)
-		log.Printf("Minimum OS: %s", app.MinimumOSVersion)
-		log.Printf("Free: %t", app.IsFree)
-		log.Printf("Universal: %t", app.IsUniversal)
-		log.Printf("Icon URL: %s", app.IconURL)
+		logAppDetails(app)
+	}
+}
+
+func logAppDetails(app interface{}) {
+	// Use reflection to access exported fields
+	v := reflect.ValueOf(app)
+	if v.Kind() == reflect.Ptr {
+		v = v.Elem()
 	}
 
-	// Get multiple applications by Bundle ID
+	if v.Kind() != reflect.Struct {
+		log.Printf("App details: %+v", app)
+
+		return
+	}
+
+	log.Printf("Name: %s", getStringField(v, "Name"))
+	log.Printf("Bundle ID: %s", getStringField(v, "BundleID"))
+	log.Printf("Artist: %s", getStringField(v, "ArtistName"))
+	log.Printf("Version: %s", getStringField(v, "Version"))
+	log.Printf("Price: $%.2f %s", getFloatField(v, "Price"), getStringField(v, "Currency"))
+	log.Printf("Rating: %.1f (%d reviews)", getFloatField(v, "Rating"), getIntField(v, "RatingCount"))
+	log.Printf("Genre: %s", getStringField(v, "GenreName"))
+	log.Printf("File Size: %.2f MB", float64(getInt64Field(v, "FileSize"))/bytesPerMB)
+	log.Printf("Minimum OS: %s", getStringField(v, "MinimumOSVersion"))
+	log.Printf("Free: %t", getBoolField(v, "IsFree"))
+	log.Printf("Universal: %t", getBoolField(v, "IsUniversal"))
+	log.Printf("Icon URL: %s", getStringField(v, "IconURL"))
+}
+
+func getStringField(v reflect.Value, field string) string {
+	f := v.FieldByName(field)
+	if !f.IsValid() || f.Kind() != reflect.String {
+		return ""
+	}
+
+	return f.String()
+}
+
+func getFloatField(v reflect.Value, field string) float64 {
+	f := v.FieldByName(field)
+	if !f.IsValid() || f.Kind() != reflect.Float64 {
+		return 0.0
+	}
+
+	return f.Float()
+}
+
+func getIntField(v reflect.Value, field string) int {
+	f := v.FieldByName(field)
+	if !f.IsValid() || f.Kind() != reflect.Int {
+		return 0
+	}
+
+	return int(f.Int())
+}
+
+func getInt64Field(v reflect.Value, field string) int64 {
+	f := v.FieldByName(field)
+	if !f.IsValid() || f.Kind() != reflect.Int64 {
+		return 0
+	}
+
+	return f.Int()
+}
+
+func getBoolField(v reflect.Value, field string) bool {
+	f := v.FieldByName(field)
+	if !f.IsValid() || f.Kind() != reflect.Bool {
+		return false
+	}
+
+	return f.Bool()
+}
+
+func demonstrateGetByBundleID(ctx context.Context, client *goitunes.Client) {
 	log.Println("\n=== Get Multiple Applications by Bundle ID ===")
 
-	apps, err = client.Applications().GetByBundleID(
+	apps, err := client.Applications().GetByBundleID(
 		ctx,
 		"com.facebook.Facebook",
 		"com.instagram.android",
@@ -61,8 +134,9 @@ func main() {
 	for i := range apps {
 		log.Printf("- %s (%s) - Rating: %.1f", apps[i].Name, apps[i].BundleID, apps[i].Rating)
 	}
+}
 
-	// Get rating information
+func demonstrateGetRating(ctx context.Context, client *goitunes.Client) {
 	log.Println("\n=== Get Rating Information ===")
 
 	rating, err := client.Applications().GetRating(ctx, "564177498")
@@ -72,8 +146,9 @@ func main() {
 
 	log.Printf("Rating: %.2f", rating.Rating)
 	log.Printf("Rating Count: %d", rating.RatingCount)
+}
 
-	// Get overall rating from open API
+func demonstrateGetOverallRating(ctx context.Context, client *goitunes.Client) {
 	log.Println("\n=== Get Overall Rating ===")
 
 	overallRating, err := client.Applications().GetOverallRating(ctx, "564177498")

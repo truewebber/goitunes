@@ -1,7 +1,6 @@
 package appstore
 
 import (
-	"bytes"
 	"context"
 	"encoding/base64"
 	"fmt"
@@ -59,67 +58,28 @@ func (c *PurchaseClient) Purchase(
 		return nil, err
 	}
 
-	// Handle re-download case
-	if purchaseResp.Metrics.DialogID == "MZCommerceSoftware.OwnsSupersededMinorSoftwareApplicationForUpdate" {
-		return nil, ErrApplicationRequiresRedownload
-	}
-
-	if len(purchaseResp.SongList) == 0 {
-		return nil, fmt.Errorf("%w for adamID: %s", ErrDownloadURLNotFound, adamID)
-	}
-
-	if len(purchaseResp.SongList) > 1 {
-		return nil, fmt.Errorf("%w for adamID: %s", ErrMultipleDownloadURLs, adamID)
+	//nolint:gocritic // err is already declared, using = to avoid shadow
+	if err = c.validatePurchaseResponse(purchaseResp, adamID); err != nil {
+		return nil, err
 	}
 
 	song := purchaseResp.SongList[0]
 
-	// Confirm download
-	confirmErr := c.ConfirmDownload(ctx, song.DownloadID)
-	if confirmErr != nil {
-		return nil, fmt.Errorf("failed to confirm download: %w", confirmErr)
+	if err = c.ConfirmDownload(ctx, song.DownloadID); err != nil {
+		return nil, fmt.Errorf("failed to confirm download: %w", err)
 	}
 
-	if len(song.Sinfs) == 0 {
-		return nil, fmt.Errorf("%w for adamID: %s", ErrNoSINFFound, adamID)
+	sinf, err := c.extractSINF(&song, adamID)
+	if err != nil {
+		return nil, err
 	}
 
-	if len(song.Sinfs) > 1 {
-		return nil, fmt.Errorf("%w for adamID: %s", ErrMultipleSINFs, adamID)
+	bundleID, err := c.extractBundleID(&song, adamID)
+	if err != nil {
+		return nil, err
 	}
 
-	sinf := bytes.TrimSpace(song.Sinfs[0].Data)
-	if len(sinf) == 0 {
-		return nil, fmt.Errorf("%w for adamID: %s", ErrSINFEmpty, adamID)
-	}
-
-	// Get bundle ID (may be in different fields)
-	bundleID := song.Metadata.BundleID
-	if bundleID == "" {
-		bundleID = song.Metadata.Q
-	}
-
-	if bundleID == "" {
-		return nil, fmt.Errorf("%w for adamID: %s", ErrBundleIDNotFound, adamID)
-	}
-
-	// Generate iTunes metadata
-	metadataBytes := c.generateMetadata(&song, bundleID)
-
-	// Build download info
-	downloadInfo := entity.NewDownloadInfo(bundleID, song.URL, song.DownloadKey)
-	downloadInfo.SetSinf(base64.StdEncoding.EncodeToString(sinf))
-	downloadInfo.SetMetadata(base64.StdEncoding.EncodeToString(metadataBytes))
-	downloadInfo.SetDownloadID(song.DownloadID)
-	downloadInfo.SetVersionID(song.Metadata.ExternalVersionID)
-
-	// Set download headers
-	downloadInfo.AddHeader(config.HeaderUserAgent, valueobject.UserAgentDownload)
-	downloadInfo.AddHeader(config.HeaderCookie, "downloadKey="+song.DownloadKey)
-	downloadInfo.AddHeader(config.HeaderXAppleStoreFront, c.store.XAppleStoreFront())
-	downloadInfo.AddHeader(config.HeaderXDsid, c.credentials.DSID())
-
-	return downloadInfo, nil
+	return c.buildDownloadInfo(&song, bundleID, sinf), nil
 }
 
 // ConfirmDownload confirms that a download has been initiated.
@@ -158,6 +118,72 @@ func (c *PurchaseClient) ConfirmDownload(ctx context.Context, downloadID string)
 	}
 
 	return nil
+}
+
+// validatePurchaseResponse validates the purchase response.
+func (c *PurchaseClient) validatePurchaseResponse(purchaseResp *model.PurchaseResponse, _ string) error {
+	if len(purchaseResp.SongList) == 0 {
+		return ErrUnexpectedResponseStructure
+	}
+
+	song := purchaseResp.SongList[0]
+
+	if song.URL == "" {
+		return ErrDownloadURLNotFound
+	}
+
+	return nil
+}
+
+// extractSINF extracts SINF from song item and encodes it to base64.
+func (c *PurchaseClient) extractSINF(song *model.SongItem, _ string) (string, error) {
+	if len(song.Sinfs) == 0 {
+		return "", ErrNoSINFFound
+	}
+
+	if len(song.Sinfs) > 1 {
+		return "", ErrMultipleSINFs
+	}
+
+	sinf := song.Sinfs[0]
+
+	if len(sinf.Data) == 0 {
+		return "", ErrSINFEmpty
+	}
+
+	return base64.StdEncoding.EncodeToString(sinf.Data), nil
+}
+
+// extractBundleID extracts bundle ID from song metadata.
+func (c *PurchaseClient) extractBundleID(song *model.SongItem, _ string) (string, error) {
+	if song.Metadata.BundleID == "" {
+		return "", ErrBundleIDNotFound
+	}
+
+	return song.Metadata.BundleID, nil
+}
+
+// buildDownloadInfo builds DownloadInfo from song item.
+func (c *PurchaseClient) buildDownloadInfo(song *model.SongItem, bundleID, sinf string) *entity.DownloadInfo {
+	downloadInfo := entity.NewDownloadInfo(bundleID, song.URL, song.DownloadKey)
+	downloadInfo.SetSinf(sinf)
+	downloadInfo.SetDownloadID(song.DownloadID)
+	downloadInfo.SetVersionID(song.Metadata.ExternalVersionID)
+
+	metadata := c.generateMetadata(song, bundleID)
+	if len(metadata) > 0 {
+		downloadInfo.SetMetadata(base64.StdEncoding.EncodeToString(metadata))
+	}
+
+	headers := map[string]string{
+		config.HeaderUserAgent:        valueobject.UserAgentDownload,
+		config.HeaderXAppleStoreFront: c.store.XAppleStoreFront(),
+		config.HeaderXDsid:            c.credentials.DSID(),
+		config.HeaderXToken:           c.credentials.PasswordToken(),
+	}
+	downloadInfo.SetHeaders(headers)
+
+	return downloadInfo
 }
 
 // buyApplication performs the buy operation.

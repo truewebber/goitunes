@@ -46,62 +46,14 @@ func New(region string, opts ...Option) (*Client, error) {
 		storeRegistry: storeRegistry,
 	}
 
-	// Apply options
-	for _, opt := range opts {
-		if err := opt(client); err != nil {
-			return nil, err
-		}
+	//nolint:gocritic // err is already declared, using = to avoid shadow
+	if err = client.applyOptions(opts); err != nil {
+		return nil, err
 	}
 
-	// Set default device if not provided
-	if client.device == nil {
-		device, deviceErr := valueobject.NewDevice(
-			"00000000-0000-0000-0000-000000000000",
-			"DefaultMachine",
-			valueobject.UserAgentWindows,
-		)
-		if deviceErr != nil {
-			return nil, fmt.Errorf("failed to create default device: %w", deviceErr)
-		}
-
-		client.device = device
-	}
-
-	// Initialize repositories
-	client.appRepo = appstore.NewApplicationClient(client.httpClient, client.store)
-	client.chartRepo = appstore.NewChartClient(client.httpClient, client.store, client.appRepo)
-
-	if client.credentials != nil {
-		client.authRepo = appstore.NewAuthClient(client.httpClient, client.store, client.device)
-		client.purchaseRepo = appstore.NewPurchaseClient(
-			client.httpClient,
-			client.store,
-			client.credentials,
-			client.device,
-		)
-	}
-
-	// Initialize services
-	client.chartService = &ChartService{
-		useCase: usecase.NewGetTopCharts(client.chartRepo),
-	}
-	client.applicationService = &ApplicationService{
-		getInfoUseCase:   usecase.NewGetApplicationInfo(client.appRepo),
-		getRatingUseCase: usecase.NewGetRating(client.appRepo),
-	}
-
-	if client.authRepo != nil {
-		client.authService = &AuthService{
-			useCase: usecase.NewAuthenticate(client.authRepo),
-			client:  client,
-		}
-	}
-
-	if client.purchaseRepo != nil {
-		client.purchaseService = &PurchaseService{
-			useCase: usecase.NewPurchaseApplication(client.purchaseRepo),
-		}
-	}
+	client.setDefaultDevice()
+	client.initializeRepositories()
+	client.initializeServices()
 
 	return client, nil
 }
@@ -152,4 +104,74 @@ func (c *Client) IsAuthenticated() bool {
 // CanPurchase returns true if the client can make purchases.
 func (c *Client) CanPurchase() bool {
 	return c.credentials != nil && c.credentials.CanPurchase()
+}
+
+// applyOptions applies options to the client.
+func (c *Client) applyOptions(opts []Option) error {
+	for _, opt := range opts {
+		if err := opt(c); err != nil {
+			return err
+		}
+	}
+
+	return nil
+}
+
+// setDefaultDevice sets default device if not provided.
+func (c *Client) setDefaultDevice() {
+	if c.device != nil {
+		return
+	}
+
+	device, err := valueobject.NewDevice(
+		"00000000-0000-0000-0000-000000000000",
+		"DefaultMachine",
+		valueobject.UserAgentWindows,
+	)
+	if err != nil {
+		// This should never happen with valid defaults
+		panic(fmt.Errorf("failed to create default device: %w", err))
+	}
+
+	c.device = device
+}
+
+// initializeRepositories initializes repository implementations.
+func (c *Client) initializeRepositories() {
+	c.appRepo = appstore.NewApplicationClient(c.httpClient, c.store)
+	c.chartRepo = appstore.NewChartClient(c.httpClient, c.store, c.appRepo)
+
+	if c.credentials != nil {
+		c.authRepo = appstore.NewAuthClient(c.httpClient, c.store, c.device)
+		c.purchaseRepo = appstore.NewPurchaseClient(
+			c.httpClient,
+			c.store,
+			c.credentials,
+			c.device,
+		)
+	}
+}
+
+// initializeServices initializes service implementations.
+func (c *Client) initializeServices() {
+	c.chartService = &ChartService{
+		useCase: usecase.NewGetTopCharts(c.chartRepo),
+	}
+	c.applicationService = &ApplicationService{
+		getInfoUseCase:   usecase.NewGetApplicationInfo(c.appRepo),
+		getRatingUseCase: usecase.NewGetRating(c.appRepo),
+	}
+
+	if c.authRepo != nil {
+		c.authService = &AuthService{
+			useCase: usecase.NewAuthenticate(c.authRepo),
+			client:  c,
+		}
+	}
+
+	if c.purchaseRepo != nil {
+		c.purchaseService = &PurchaseService{
+			useCase: usecase.NewPurchaseApplication(c.purchaseRepo),
+		}
+	}
 }
