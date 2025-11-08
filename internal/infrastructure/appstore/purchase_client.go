@@ -51,7 +51,7 @@ func (c *PurchaseClient) Purchase(
 	versionID int64,
 ) (*entity.DownloadInfo, error) {
 	if !c.credentials.CanPurchase() {
-		return nil, fmt.Errorf("%w", ErrCredentialsDoNotSupportPurchasing)
+		return nil, ErrCredentialsDoNotSupportPurchasing
 	}
 
 	purchaseResp, err := c.buyApplication(ctx, adamID, versionID, repository.PricingParameterBuy)

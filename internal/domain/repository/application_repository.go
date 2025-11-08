@@ -6,7 +6,7 @@ import (
 	"github.com/truewebber/goitunes/v2/internal/domain/entity"
 )
 
-// ApplicationRepository defines the interface for application data access
+// ApplicationRepository defines the interface for application data access.
 type ApplicationRepository interface {
 	// FindByAdamID finds applications by their Adam IDs
 	FindByAdamID(ctx context.Context, adamIDs []string) ([]*entity.Application, error)

@@ -18,14 +18,14 @@ import (
 	infrahttp "github.com/truewebber/goitunes/v2/internal/infrastructure/http"
 )
 
-// ApplicationClient implements ApplicationRepository interface
+// ApplicationClient implements ApplicationRepository interface.
 type ApplicationClient struct {
 	httpClient      infrahttp.Client
 	store           *valueobject.Store
 	currencyService *service.CurrencyService
 }
 
-// NewApplicationClient creates a new application client
+// NewApplicationClient creates a new application client.
 func NewApplicationClient(httpClient infrahttp.Client, store *valueobject.Store) *ApplicationClient {
 	return &ApplicationClient{
 		httpClient:      httpClient,
@@ -34,7 +34,7 @@ func NewApplicationClient(httpClient infrahttp.Client, store *valueobject.Store)
 	}
 }
 
-// FindByAdamID finds applications by their Adam IDs
+// FindByAdamID finds applications by their Adam IDs.
 func (c *ApplicationClient) FindByAdamID(ctx context.Context, adamIDs []string) ([]*entity.Application, error) {
 	query := url.Values{
 		"version":  []string{"2"},
@@ -55,7 +55,13 @@ func (c *ApplicationClient) FindByAdamID(ctx context.Context, adamIDs []string) 
 	if err != nil {
 		return nil, fmt.Errorf("failed to send request: %w", err)
 	}
-	defer resp.Body.Close()
+
+	defer func() {
+		if closeErr := resp.Body.Close(); closeErr != nil {
+			// Log error but don't fail the function
+			_ = closeErr
+		}
+	}()
 
 	if resp.StatusCode != http.StatusOK {
 		return nil, fmt.Errorf("unexpected status code: %d", resp.StatusCode)
@@ -84,7 +90,7 @@ func (c *ApplicationClient) FindByAdamID(ctx context.Context, adamIDs []string) 
 	return apps, nil
 }
 
-// FindByBundleID finds applications by their Bundle IDs
+// FindByBundleID finds applications by their Bundle IDs.
 func (c *ApplicationClient) FindByBundleID(ctx context.Context, bundleIDs []string) ([]*entity.Application, error) {
 	query := url.Values{
 		"version":  []string{"2"},
@@ -105,7 +111,13 @@ func (c *ApplicationClient) FindByBundleID(ctx context.Context, bundleIDs []stri
 	if err != nil {
 		return nil, fmt.Errorf("failed to send request: %w", err)
 	}
-	defer resp.Body.Close()
+
+	defer func() {
+		if closeErr := resp.Body.Close(); closeErr != nil {
+			// Log error but don't fail the function
+			_ = closeErr
+		}
+	}()
 
 	if resp.StatusCode != http.StatusOK {
 		return nil, fmt.Errorf("unexpected status code: %d", resp.StatusCode)
@@ -134,7 +146,7 @@ func (c *ApplicationClient) FindByBundleID(ctx context.Context, bundleIDs []stri
 	return apps, nil
 }
 
-// GetFullInfo retrieves detailed information about an application
+// GetFullInfo retrieves detailed information about an application.
 func (c *ApplicationClient) GetFullInfo(ctx context.Context, adamID string) (*entity.Application, error) {
 	req, err := http.NewRequestWithContext(ctx, http.MethodGet, fmt.Sprintf(config.NativeAppInfoURL, adamID), nil)
 	if err != nil {
@@ -147,7 +159,13 @@ func (c *ApplicationClient) GetFullInfo(ctx context.Context, adamID string) (*en
 	if err != nil {
 		return nil, fmt.Errorf("failed to send request: %w", err)
 	}
-	defer resp.Body.Close()
+
+	defer func() {
+		if closeErr := resp.Body.Close(); closeErr != nil {
+			// Log error but don't fail the function
+			_ = closeErr
+		}
+	}()
 
 	if resp.StatusCode != http.StatusOK {
 		return nil, fmt.Errorf("unexpected status code: %d", resp.StatusCode)
@@ -171,7 +189,7 @@ func (c *ApplicationClient) GetFullInfo(ctx context.Context, adamID string) (*en
 	return c.mapToEntity(item), nil
 }
 
-// GetRating retrieves rating information for an application
+// GetRating retrieves rating information for an application.
 func (c *ApplicationClient) GetRating(ctx context.Context, adamID string) (float64, int, error) {
 	req, err := http.NewRequestWithContext(ctx, http.MethodGet, fmt.Sprintf(config.NativeAppRatingInfoURL, adamID), nil)
 	if err != nil {
@@ -184,7 +202,13 @@ func (c *ApplicationClient) GetRating(ctx context.Context, adamID string) (float
 	if err != nil {
 		return 0, 0, fmt.Errorf("failed to send request: %w", err)
 	}
-	defer resp.Body.Close()
+
+	defer func() {
+		if closeErr := resp.Body.Close(); closeErr != nil {
+			// Log error but don't fail the function
+			_ = closeErr
+		}
+	}()
 
 	if resp.StatusCode != http.StatusOK {
 		return 0, 0, fmt.Errorf("unexpected status code: %d", resp.StatusCode)
@@ -203,7 +227,7 @@ func (c *ApplicationClient) GetRating(ctx context.Context, adamID string) (float
 	return response.UserRating.Value, response.UserRating.RatingCount, nil
 }
 
-// GetOverallRating retrieves overall rating information
+// GetOverallRating retrieves overall rating information.
 func (c *ApplicationClient) GetOverallRating(ctx context.Context, adamID string) (float64, int, error) {
 	req, err := http.NewRequestWithContext(
 		ctx,
@@ -219,7 +243,13 @@ func (c *ApplicationClient) GetOverallRating(ctx context.Context, adamID string)
 	if err != nil {
 		return 0, 0, fmt.Errorf("failed to send request: %w", err)
 	}
-	defer resp.Body.Close()
+
+	defer func() {
+		if closeErr := resp.Body.Close(); closeErr != nil {
+			// Log error but don't fail the function
+			_ = closeErr
+		}
+	}()
 
 	if resp.StatusCode != http.StatusOK {
 		return 0, 0, fmt.Errorf("unexpected status code: %d", resp.StatusCode)
@@ -243,7 +273,7 @@ func (c *ApplicationClient) GetOverallRating(ctx context.Context, adamID string)
 	return result.AverageUserRating, result.UserRatingCount, nil
 }
 
-// mapToEntity maps API response to domain entity
+// mapToEntity maps API response to domain entity.
 func (c *ApplicationClient) mapToEntity(item model.AppItemResponse) *entity.Application {
 	app := entity.NewApplication(item.ID, item.BundleID, item.Name)
 	app.SetArtistName(item.ArtistName)

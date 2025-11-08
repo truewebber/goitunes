@@ -18,7 +18,7 @@ import (
 	infrahttp "github.com/truewebber/goitunes/v2/internal/infrastructure/http"
 )
 
-// ChartClient implements ChartRepository interface
+// ChartClient implements ChartRepository interface.
 type ChartClient struct {
 	httpClient      infrahttp.Client
 	store           *valueobject.Store
@@ -26,7 +26,7 @@ type ChartClient struct {
 	currencyService *service.CurrencyService
 }
 
-// NewChartClient creates a new chart client
+// NewChartClient creates a new chart client.
 func NewChartClient(
 	httpClient infrahttp.Client,
 	store *valueobject.Store,
@@ -40,7 +40,7 @@ func NewChartClient(
 	}
 }
 
-// GetTop200 retrieves the top 200 applications
+// GetTop200 retrieves the top 200 applications.
 func (c *ChartClient) GetTop200(
 	ctx context.Context,
 	genreID string,
@@ -156,7 +156,7 @@ func (c *ChartClient) GetTop200(
 	return chartItems, nil
 }
 
-// GetTop1500 retrieves up to 1500 applications
+// GetTop1500 retrieves up to 1500 applications.
 func (c *ChartClient) GetTop1500(
 	ctx context.Context,
 	genreID string,
@@ -230,7 +230,7 @@ func (c *ChartClient) GetTop1500(
 	return chartItems, nil
 }
 
-// chartTypeToPopID converts chart type to popID
+// chartTypeToPopID converts chart type to popID.
 func (c *ChartClient) chartTypeToPopID(chartType entity.ChartType) string {
 	switch chartType {
 	case entity.ChartTypeTopFree:
@@ -244,7 +244,7 @@ func (c *ChartClient) chartTypeToPopID(chartType entity.ChartType) string {
 	}
 }
 
-// mapAppItemToEntity maps API response to entity
+// mapAppItemToEntity maps API response to entity.
 func (c *ChartClient) mapAppItemToEntity(item model.AppItemResponse) *entity.Application {
 	app := entity.NewApplication(item.ID, item.BundleID, item.Name)
 	app.SetArtistName(item.ArtistName)

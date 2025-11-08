@@ -50,7 +50,7 @@ const (
 	GenrePhotoVideo          Genre = "6008" // Photo & Video
 )
 
-// Game sub-genres (parent: 6014)
+// Game sub-genres (parent: 6014).
 const (
 	GenreGamesAction      Genre = "7001" // Action
 	GenreGamesAdventure   Genre = "7002" // Adventure
@@ -72,14 +72,14 @@ const (
 	GenreGamesWord        Genre = "7019" // Word
 )
 
-// Kids sub-genres (parent: KIDS)
+// Kids sub-genres (parent: KIDS).
 const (
 	GenreKidsLess5 Genre = "KIDS_LESS_5"  // Kids 5 & Under
 	GenreKids6To8  Genre = "KIDS_6_TO_8"  // Kids 6–8
 	GenreKids9To11 Genre = "KIDS_9_TO_11" // Kids 9–11
 )
 
-// Magazines & Newspapers sub-genres (parent: 6021)
+// Magazines & Newspapers sub-genres (parent: 6021).
 const (
 	GenreMagazinesArtsPhotography   Genre = "13007" // Arts & Photography
 	GenreMagazinesAutomotive        Genre = "13006" // Automotive
@@ -109,7 +109,7 @@ const (
 	GenreMagazinesWomensInterest    Genre = "13030" // Women's Interest
 )
 
-// genreNames maps genre IDs to their human-readable names
+// genreNames maps genre IDs to their human-readable names.
 var genreNames = map[Genre]string{
 	// Main genres
 	GenreAll:                 "All Categories",
@@ -193,7 +193,7 @@ var genreNames = map[Genre]string{
 	GenreMagazinesWomensInterest:    "Women's Interest",
 }
 
-// Common user agents
+// Common user agents.
 const (
 	UserAgentWindows  = "iTunes/10.6 (Windows; Microsoft Windows 7 x64 Ultimate Edition Service Pack 1 (Build 7601)) AppleWebKit/534.54.16"
 	UserAgentTop200   = "AppStore/2.0 iOS/9.0 model/iPhone6,1 hwp/s5l8960x build/13A344 (6; dt:89)"

@@ -5,16 +5,16 @@ import (
 	"strings"
 )
 
-// CurrencyService provides currency-related operations
+// CurrencyService provides currency-related operations.
 type CurrencyService struct{}
 
-// NewCurrencyService creates a new CurrencyService
+// NewCurrencyService creates a new CurrencyService.
 func NewCurrencyService() *CurrencyService {
 	return &CurrencyService{}
 }
 
-// ExtractCurrency extracts the currency label from a formatted price string
-// Examples: "$1.99" -> "$", "Free" -> "", "Get" -> ""
+// ExtractCurrency extracts the currency label from a formatted price string.
+// Examples: "$1.99" -> "$", "Free" -> "", "Get" -> "".
 func (s *CurrencyService) ExtractCurrency(price float64, formattedPrice string) string {
 	if price == 0 {
 		return ""
@@ -28,7 +28,7 @@ func (s *CurrencyService) ExtractCurrency(price float64, formattedPrice string) 
 	return currency
 }
 
-// FormatPrice formats a price with currency
+// FormatPrice formats a price with currency.
 func (s *CurrencyService) FormatPrice(price float64, currency string) string {
 	if price == 0 {
 		return "Free"
@@ -38,4 +38,3 @@ func (s *CurrencyService) FormatPrice(price float64, currency string) string {
 	}
 	return currency
 }
-

@@ -16,14 +16,14 @@ import (
 	infrahttp "github.com/truewebber/goitunes/v2/internal/infrastructure/http"
 )
 
-// AuthClient implements AuthRepository interface
+// AuthClient implements AuthRepository interface.
 type AuthClient struct {
 	httpClient infrahttp.Client
 	store      *valueobject.Store
 	device     *valueobject.Device
 }
 
-// NewAuthClient creates a new authentication client
+// NewAuthClient creates a new authentication client.
 func NewAuthClient(
 	httpClient infrahttp.Client,
 	store *valueobject.Store,
@@ -36,7 +36,7 @@ func NewAuthClient(
 	}
 }
 
-// Authenticate performs authentication with Apple ID and password
+// Authenticate performs authentication with Apple ID and password.
 func (c *AuthClient) Authenticate(
 	ctx context.Context,
 	appleID, password string,
@@ -93,7 +93,7 @@ func (c *AuthClient) Authenticate(
 	return credentials, nil
 }
 
-// buildLoginBody creates the request body for login
+// buildLoginBody creates the request body for login.
 func (c *AuthClient) buildLoginBody(appleID, password string) *strings.Reader {
 	params := url.Values{
 		"machineName":   {c.device.MachineName()},

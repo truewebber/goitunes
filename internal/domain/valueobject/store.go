@@ -5,7 +5,7 @@ import (
 	"strings"
 )
 
-// Store represents an App Store region configuration
+// Store represents an App Store region configuration.
 type Store struct {
 	region           string
 	storeFront       int
@@ -13,7 +13,7 @@ type Store struct {
 	xAppleStoreFront string
 }
 
-// NewStore creates a new Store value object
+// NewStore creates a new Store value object.
 func NewStore(region string, storeFront, hostPrefix int) (*Store, error) {
 	region = strings.ToLower(strings.TrimSpace(region))
 	if region == "" {
@@ -34,18 +34,18 @@ func NewStore(region string, storeFront, hostPrefix int) (*Store, error) {
 	}, nil
 }
 
-// Getters
+// Getters.
 func (s *Store) Region() string           { return s.region }
 func (s *Store) StoreFront() int          { return s.storeFront }
 func (s *Store) HostPrefix() int          { return s.hostPrefix }
 func (s *Store) XAppleStoreFront() string { return s.xAppleStoreFront }
 
-// XAppleStoreFrontWithDevice returns the X-Apple-Store-Front header with device code
+// XAppleStoreFrontWithDevice returns the X-Apple-Store-Front header with device code.
 func (s *Store) XAppleStoreFrontWithDevice(deviceCode int) string {
 	return fmt.Sprintf("%d,%d", s.storeFront, deviceCode)
 }
 
-// Equals checks if two stores are equal
+// Equals checks if two stores are equal.
 func (s *Store) Equals(other *Store) bool {
 	if other == nil {
 		return false
@@ -54,4 +54,3 @@ func (s *Store) Equals(other *Store) bool {
 		s.storeFront == other.storeFront &&
 		s.hostPrefix == other.hostPrefix
 }
-

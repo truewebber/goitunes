@@ -6,7 +6,7 @@ import (
 	"github.com/truewebber/goitunes/v2/internal/domain/entity"
 )
 
-// PurchaseRepository defines the interface for purchase and download operations
+// PurchaseRepository defines the interface for purchase and download operations.
 type PurchaseRepository interface {
 	// Purchase initiates a purchase for an application
 	// Returns download information including URL, keys, and metadata
@@ -16,7 +16,7 @@ type PurchaseRepository interface {
 	ConfirmDownload(ctx context.Context, downloadID string) error
 }
 
-// PricingParameter defines the type of purchase operation
+// PricingParameter defines the type of purchase operation.
 type PricingParameter string
 
 const (

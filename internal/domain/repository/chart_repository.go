@@ -6,7 +6,7 @@ import (
 	"github.com/truewebber/goitunes/v2/internal/domain/entity"
 )
 
-// ChartRepository defines the interface for chart data access
+// ChartRepository defines the interface for chart data access.
 type ChartRepository interface {
 	// GetTop200 retrieves the top 200 applications for a genre and chart type
 	// genreID: the genre identifier (e.g., "36" for all)

@@ -2,14 +2,14 @@ package valueobject
 
 import "fmt"
 
-// Device represents a device configuration for App Store requests
+// Device represents a device configuration for App Store requests.
 type Device struct {
 	guid        string
 	machineName string
 	userAgent   string
 }
 
-// NewDevice creates a new Device value object
+// NewDevice creates a new Device value object.
 func NewDevice(guid, machineName, userAgent string) (*Device, error) {
 	if guid == "" {
 		return nil, fmt.Errorf("guid cannot be empty")
@@ -28,12 +28,12 @@ func NewDevice(guid, machineName, userAgent string) (*Device, error) {
 	}, nil
 }
 
-// Getters
+// Getters.
 func (d *Device) GUID() string        { return d.guid }
 func (d *Device) MachineName() string { return d.machineName }
 func (d *Device) UserAgent() string   { return d.userAgent }
 
-// Equals checks if two devices are equal
+// Equals checks if two devices are equal.
 func (d *Device) Equals(other *Device) bool {
 	if other == nil {
 		return false
@@ -43,7 +43,7 @@ func (d *Device) Equals(other *Device) bool {
 		d.userAgent == other.userAgent
 }
 
-// DefaultUserAgents contains commonly used user agents
+// DefaultUserAgents contains commonly used user agents.
 var (
 	UserAgentTop200   = "AppStore/2.0 iOS/9.0 model/iPhone6,1 hwp/s5l8960x build/13A344 (6; dt:89)"
 	UserAgentTop1500  = "iTunes-iPad/5.1.1 (64GB; dt:28)"
