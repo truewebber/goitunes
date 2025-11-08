@@ -25,7 +25,7 @@ func NewStoreRegistry() *StoreRegistry {
 func (r *StoreRegistry) GetStore(region string) (*valueobject.Store, error) {
 	store, exists := r.stores[region]
 	if !exists {
-		return nil, fmt.Errorf("unsupported region: %s", region)
+		return nil, fmt.Errorf("%w: %s", ErrUnsupportedRegion, region)
 	}
 
 	return store, nil

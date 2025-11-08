@@ -26,4 +26,28 @@ var (
 
 	// ErrBundleIDNotFound is returned when bundle ID is not found in response.
 	ErrBundleIDNotFound = errors.New("bundle ID not found in response")
+
+	// ErrEmptyPassword is returned when password is empty.
+	ErrEmptyPassword = errors.New("password cannot be empty")
+
+	// ErrUnexpectedStatusCode is returned when HTTP response has unexpected status code.
+	ErrUnexpectedStatusCode = errors.New("unexpected status code")
+
+	// ErrPasswordTokenNotFound is returned when password token is not found in response.
+	ErrPasswordTokenNotFound = errors.New("password token not found in response")
+
+	// ErrDSIDNotFound is returned when DSID is not found in response.
+	ErrDSIDNotFound = errors.New("DSID not found in response")
+
+	// ErrNoResultsFound is returned when no results are found.
+	ErrNoResultsFound = errors.New("no results found")
+
+	// ErrAdamIDNotFound is returned when Adam ID is not found in response.
+	ErrAdamIDNotFound = errors.New("adamID not found in response")
+
+	// ErrNoRatingFound is returned when no rating is found.
+	ErrNoRatingFound = errors.New("no rating found")
+
+	// ErrUnexpectedResponseStructure is returned when response structure is unexpected.
+	ErrUnexpectedResponseStructure = errors.New("unexpected response structure")
 )

@@ -46,7 +46,7 @@ func (c *ApplicationClient) FindByAdamID(ctx context.Context, adamIDs []string) 
 		"l":        []string{"en_us"},
 	}
 
-	req, err := http.NewRequestWithContext(ctx, http.MethodGet, config.AppInfoURL+"?"+query.Encode(), nil)
+	req, err := http.NewRequestWithContext(ctx, http.MethodGet, config.AppInfoURL+"?"+query.Encode(), http.NoBody)
 	if err != nil {
 		return nil, fmt.Errorf("failed to create request: %w", err)
 	}
@@ -64,7 +64,7 @@ func (c *ApplicationClient) FindByAdamID(ctx context.Context, adamIDs []string) 
 	}()
 
 	if resp.StatusCode != http.StatusOK {
-		return nil, fmt.Errorf("unexpected status code: %d", resp.StatusCode)
+		return nil, fmt.Errorf("%w: %d", ErrUnexpectedStatusCode, resp.StatusCode)
 	}
 
 	data, err := io.ReadAll(resp.Body)
@@ -73,15 +73,17 @@ func (c *ApplicationClient) FindByAdamID(ctx context.Context, adamIDs []string) 
 	}
 
 	var response model.LookupResponse
+
 	if err := json.Unmarshal(data, &response); err != nil {
 		return nil, fmt.Errorf("failed to unmarshal response: %w", err)
 	}
 
 	if len(response.Results) == 0 {
-		return nil, fmt.Errorf("no results found for adamIds: %s", strings.Join(adamIDs, ","))
+		return nil, fmt.Errorf("%w for adamIds: %s", ErrNoResultsFound, strings.Join(adamIDs, ","))
 	}
 
 	var apps []*entity.Application
+
 	for _, item := range response.Results {
 		app := c.mapToEntity(item)
 		apps = append(apps, app)
@@ -102,7 +104,7 @@ func (c *ApplicationClient) FindByBundleID(ctx context.Context, bundleIDs []stri
 		"l":        []string{"en_us"},
 	}
 
-	req, err := http.NewRequestWithContext(ctx, http.MethodGet, config.AppInfoURL+"?"+query.Encode(), nil)
+	req, err := http.NewRequestWithContext(ctx, http.MethodGet, config.AppInfoURL+"?"+query.Encode(), http.NoBody)
 	if err != nil {
 		return nil, fmt.Errorf("failed to create request: %w", err)
 	}
@@ -120,7 +122,7 @@ func (c *ApplicationClient) FindByBundleID(ctx context.Context, bundleIDs []stri
 	}()
 
 	if resp.StatusCode != http.StatusOK {
-		return nil, fmt.Errorf("unexpected status code: %d", resp.StatusCode)
+		return nil, fmt.Errorf("%w: %d", ErrUnexpectedStatusCode, resp.StatusCode)
 	}
 
 	data, err := io.ReadAll(resp.Body)
@@ -129,15 +131,17 @@ func (c *ApplicationClient) FindByBundleID(ctx context.Context, bundleIDs []stri
 	}
 
 	var response model.LookupResponse
+
 	if err := json.Unmarshal(data, &response); err != nil {
 		return nil, fmt.Errorf("failed to unmarshal response: %w", err)
 	}
 
 	if len(response.Results) == 0 {
-		return nil, fmt.Errorf("no results found for bundleIds: %s", strings.Join(bundleIDs, ","))
+		return nil, fmt.Errorf("%w for bundleIds: %s", ErrNoResultsFound, strings.Join(bundleIDs, ","))
 	}
 
 	var apps []*entity.Application
+
 	for _, item := range response.Results {
 		app := c.mapToEntity(item)
 		apps = append(apps, app)
@@ -148,7 +152,7 @@ func (c *ApplicationClient) FindByBundleID(ctx context.Context, bundleIDs []stri
 
 // GetFullInfo retrieves detailed information about an application.
 func (c *ApplicationClient) GetFullInfo(ctx context.Context, adamID string) (*entity.Application, error) {
-	req, err := http.NewRequestWithContext(ctx, http.MethodGet, fmt.Sprintf(config.NativeAppInfoURL, adamID), nil)
+	req, err := http.NewRequestWithContext(ctx, http.MethodGet, fmt.Sprintf(config.NativeAppInfoURL, adamID), http.NoBody)
 	if err != nil {
 		return nil, fmt.Errorf("failed to create request: %w", err)
 	}
@@ -168,7 +172,7 @@ func (c *ApplicationClient) GetFullInfo(ctx context.Context, adamID string) (*en
 	}()
 
 	if resp.StatusCode != http.StatusOK {
-		return nil, fmt.Errorf("unexpected status code: %d", resp.StatusCode)
+		return nil, fmt.Errorf("%w: %d", ErrUnexpectedStatusCode, resp.StatusCode)
 	}
 
 	data, err := io.ReadAll(resp.Body)
@@ -177,13 +181,14 @@ func (c *ApplicationClient) GetFullInfo(ctx context.Context, adamID string) (*en
 	}
 
 	var response model.FullAppResponse
+
 	if err := json.Unmarshal(data, &response); err != nil {
 		return nil, fmt.Errorf("failed to unmarshal response: %w", err)
 	}
 
 	item, ok := response.StorePlatformData.ProductDv.Results[adamID]
 	if !ok {
-		return nil, fmt.Errorf("adamID %s not found in response", adamID)
+		return nil, fmt.Errorf("%w: %s", ErrAdamIDNotFound, adamID)
 	}
 
 	return c.mapToEntity(item), nil
@@ -191,7 +196,7 @@ func (c *ApplicationClient) GetFullInfo(ctx context.Context, adamID string) (*en
 
 // GetRating retrieves rating information for an application.
 func (c *ApplicationClient) GetRating(ctx context.Context, adamID string) (float64, int, error) {
-	req, err := http.NewRequestWithContext(ctx, http.MethodGet, fmt.Sprintf(config.NativeAppRatingInfoURL, adamID), nil)
+	req, err := http.NewRequestWithContext(ctx, http.MethodGet, fmt.Sprintf(config.NativeAppRatingInfoURL, adamID), http.NoBody)
 	if err != nil {
 		return 0, 0, fmt.Errorf("failed to create request: %w", err)
 	}
@@ -211,7 +216,7 @@ func (c *ApplicationClient) GetRating(ctx context.Context, adamID string) (float
 	}()
 
 	if resp.StatusCode != http.StatusOK {
-		return 0, 0, fmt.Errorf("unexpected status code: %d", resp.StatusCode)
+		return 0, 0, fmt.Errorf("%w: %d", ErrUnexpectedStatusCode, resp.StatusCode)
 	}
 
 	data, err := io.ReadAll(resp.Body)
@@ -220,6 +225,7 @@ func (c *ApplicationClient) GetRating(ctx context.Context, adamID string) (float
 	}
 
 	var response model.RatingResponse
+
 	if err := json.Unmarshal(data, &response); err != nil {
 		return 0, 0, fmt.Errorf("failed to unmarshal response: %w", err)
 	}
@@ -229,12 +235,7 @@ func (c *ApplicationClient) GetRating(ctx context.Context, adamID string) (float
 
 // GetOverallRating retrieves overall rating information.
 func (c *ApplicationClient) GetOverallRating(ctx context.Context, adamID string) (float64, int, error) {
-	req, err := http.NewRequestWithContext(
-		ctx,
-		http.MethodGet,
-		fmt.Sprintf(config.OpenAppOverAllRatingInfoURL, adamID, c.store.Region()),
-		nil,
-	)
+	req, err := http.NewRequestWithContext(ctx, http.MethodGet, fmt.Sprintf(config.OpenAppOverAllRatingInfoURL, adamID, c.store.Region()), http.NoBody)
 	if err != nil {
 		return 0, 0, fmt.Errorf("failed to create request: %w", err)
 	}
@@ -252,7 +253,7 @@ func (c *ApplicationClient) GetOverallRating(ctx context.Context, adamID string)
 	}()
 
 	if resp.StatusCode != http.StatusOK {
-		return 0, 0, fmt.Errorf("unexpected status code: %d", resp.StatusCode)
+		return 0, 0, fmt.Errorf("%w: %d", ErrUnexpectedStatusCode, resp.StatusCode)
 	}
 
 	data, err := io.ReadAll(resp.Body)
@@ -261,15 +262,17 @@ func (c *ApplicationClient) GetOverallRating(ctx context.Context, adamID string)
 	}
 
 	var response model.OverallRatingResponse
+
 	if err := json.Unmarshal(data, &response); err != nil {
 		return 0, 0, fmt.Errorf("failed to unmarshal response: %w", err)
 	}
 
 	if len(response.Results) == 0 {
-		return 0, 0, fmt.Errorf("no rating found for adamID: %s", adamID)
+		return 0, 0, fmt.Errorf("%w for adamID: %s", ErrNoRatingFound, adamID)
 	}
 
 	result := response.Results[0]
+
 	return result.AverageUserRating, result.UserRatingCount, nil
 }
 
@@ -301,11 +304,13 @@ func (c *ApplicationClient) mapToEntity(item model.AppItemResponse) *entity.Appl
 	}
 
 	var screenshots []string
+
 	for _, screenList := range item.ScreenshotsByType {
 		for _, screen := range screenList {
 			screenshots = append(screenshots, screen.URL)
 		}
 	}
+
 	if len(screenshots) > 0 {
 		app.SetScreenshotURLs(screenshots)
 	}
@@ -324,6 +329,7 @@ func (c *ApplicationClient) mapToEntity(item model.AppItemResponse) *entity.Appl
 	if len(item.FileSizeByDevice) > 0 {
 		for _, size := range item.FileSizeByDevice {
 			app.SetFileSize(int64(size))
+
 			break
 		}
 	}

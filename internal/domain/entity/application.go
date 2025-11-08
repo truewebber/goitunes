@@ -4,26 +4,26 @@ import "time"
 
 // Application represents an iOS application in the App Store.
 type Application struct {
-	adamID           string
-	bundleID         string
-	name             string
+	releaseDate      time.Time
+	description      string
+	currency         string
 	artistName       string
 	artistID         string
 	version          string
-	versionID        int64
-	price            float64
-	currency         string
-	rating           float64
-	ratingCount      int
-	releaseDate      time.Time
-	genreID          string
 	genreName        string
-	deviceFamilies   []string
-	fileSize         int64
-	minimumOSVersion string
-	description      string
 	iconURL          string
+	name             string
+	minimumOSVersion string
+	adamID           string
+	bundleID         string
+	genreID          string
 	screenshotURLs   []string
+	deviceFamilies   []string
+	ratingCount      int
+	fileSize         int64
+	rating           float64
+	price            float64
+	versionID        int64
 }
 
 // NewApplication creates a new Application entity.

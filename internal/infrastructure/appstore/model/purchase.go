@@ -2,60 +2,60 @@ package model
 
 // PurchaseResponse represents the response from buy/purchase API.
 type PurchaseResponse struct {
-	SongList []SongItem `plist:"songList"`
-	Metrics  struct {
+	Metrics struct {
 		DialogID    string `plist:"dialogId"`
 		MtRequestID string `plist:"mtRequestId"`
 	} `plist:"metrics"`
+	SongList []SongItem `plist:"songList"`
 }
 
 // SongItem represents a downloadable item.
 type SongItem struct {
-	SongID       int64    `plist:"songId"`
 	URL          string   `plist:"URL"`
 	DownloadKey  string   `plist:"downloadKey"`
-	Sinfs        []Sinf   `plist:"sinfs"`
 	PurchaseDate string   `plist:"purchaseDate"`
 	DownloadID   string   `plist:"download-id"`
+	Sinfs        []Sinf   `plist:"sinfs"`
 	Metadata     Metadata `plist:"metadata"`
+	SongID       int64    `plist:"songId"`
 }
 
 // Sinf represents DRM information.
 type Sinf struct {
-	ID   int    `plist:"id"`
 	Data []byte `plist:"sinf"`
+	ID   int    `plist:"id"`
 }
 
 // Metadata represents application metadata.
 type Metadata struct {
-	BundleDisplayName          string  `plist:"bundleDisplayName"`
-	BundleID                   string  `plist:"softwareVersionBundleId"`
+	Rating                     Rating  `plist:"rating"`
+	BundleVersion              string  `plist:"bundleVersion"`
 	Q                          string  `plist:"q"`
-	ArtistID                   int64   `plist:"artistId"`
+	BundleID                   string  `plist:"softwareVersionBundleId"`
 	ArtistName                 string  `plist:"artistName"`
 	BundleShortVersionString   string  `plist:"bundleShortVersionString"`
-	BundleVersion              string  `plist:"bundleVersion"`
+	ReleaseDate                string  `plist:"releaseDate"`
 	Copyright                  string  `plist:"copyright"`
 	Genre                      string  `plist:"genre"`
-	GenreID                    int     `plist:"genreId"`
-	ItemID                     int64   `plist:"itemId"`
+	BundleDisplayName          string  `plist:"bundleDisplayName"`
+	SoftwareIcon57x57URL       string  `plist:"softwareIcon57x57URL"`
 	ItemName                   string  `plist:"itemName"`
 	PlaylistName               string  `plist:"playlistName"`
-	ReleaseDate                string  `plist:"releaseDate"`
-	SoftwareIcon57x57URL       string  `plist:"softwareIcon57x57URL"`
 	SoftwareSupportedDeviceIDs []int   `plist:"softwareSupportedDeviceIds"`
-	ExternalVersionID          int64   `plist:"softwareVersionExternalIdentifier"`
 	ExternalVersionIDList      []int64 `plist:"softwareVersionExternalIdentifiers"`
+	ItemID                     int64   `plist:"itemId"`
+	GenreID                    int     `plist:"genreId"`
+	ExternalVersionID          int64   `plist:"softwareVersionExternalIdentifier"`
 	VendorID                   int64   `plist:"vendorId"`
 	DRMVersionNumber           int     `plist:"drmVersionNumber"`
 	VersionRestrictions        int64   `plist:"versionRestrictions"`
-	Rating                     Rating  `plist:"rating"`
+	ArtistID                   int64   `plist:"artistId"`
 }
 
 // Rating represents content rating.
 type Rating struct {
 	Content string `plist:"content"`
 	Label   string `plist:"label"`
-	Rank    int    `plist:"rank"`
 	System  string `plist:"system"`
+	Rank    int    `plist:"rank"`
 }

@@ -154,7 +154,7 @@ func (c *PurchaseClient) ConfirmDownload(ctx context.Context, downloadID string)
 	}()
 
 	if resp.StatusCode != http.StatusOK {
-		return fmt.Errorf("unexpected status code: %d", resp.StatusCode)
+		return fmt.Errorf("%w: %d", ErrUnexpectedStatusCode, resp.StatusCode)
 	}
 
 	return nil
@@ -200,7 +200,7 @@ func (c *PurchaseClient) buyApplication(
 	}()
 
 	if resp.StatusCode != http.StatusOK {
-		return nil, fmt.Errorf("unexpected status code: %d", resp.StatusCode)
+		return nil, fmt.Errorf("%w: %d", ErrUnexpectedStatusCode, resp.StatusCode)
 	}
 
 	data, err := io.ReadAll(resp.Body)
@@ -209,6 +209,7 @@ func (c *PurchaseClient) buyApplication(
 	}
 
 	var purchaseResp model.PurchaseResponse
+
 	unmarshalErr := plist.Unmarshal(data, &purchaseResp)
 	if unmarshalErr != nil {
 		return nil, fmt.Errorf("failed to unmarshal response: %w", unmarshalErr)

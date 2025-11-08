@@ -6,10 +6,14 @@ import (
 	"github.com/truewebber/goitunes/v2/internal/domain/valueobject"
 )
 
+const (
+	testAppleID = "test@example.com"
+)
+
 func TestNewCredentials(t *testing.T) {
 	t.Parallel()
 
-	appleID := "test@example.com"
+	appleID := testAppleID
 
 	creds, err := valueobject.NewCredentials(appleID)
 	if err != nil {
@@ -37,7 +41,7 @@ func TestNewCredentials_EmptyAppleID(t *testing.T) {
 func TestNewCredentialsWithTokens(t *testing.T) {
 	t.Parallel()
 
-	appleID := "test@example.com"
+	appleID := testAppleID
 	token := "test_token"
 	dsid := "123456"
 
@@ -73,15 +77,13 @@ func TestNewCredentialsWithTokens_Validation(t *testing.T) {
 		dsid        string
 		expectError bool
 	}{
-		{"Valid", "test@example.com", "token", "123", false},
+		{"Valid", testAppleID, "token", "123", false},
 		{"Empty appleID", "", "token", "123", true},
-		{"Empty token", "test@example.com", "", "123", true},
-		{"Empty DSID", "test@example.com", "token", "", true},
+		{"Empty token", testAppleID, "", "123", true},
+		{"Empty DSID", testAppleID, "token", "", true},
 	}
 
 	for _, tt := range tests {
-		tt := tt
-
 		t.Run(tt.name, func(t *testing.T) {
 			t.Parallel()
 
@@ -101,7 +103,7 @@ func TestCredentials_CanPurchase(t *testing.T) {
 	t.Parallel()
 
 	// Without kbsync
-	creds, err := valueobject.NewCredentialsWithTokens("test@example.com", "token", "123")
+	creds, err := valueobject.NewCredentialsWithTokens(testAppleID, "token", "123")
 	if err != nil {
 		t.Fatalf("Failed to create credentials: %v", err)
 	}
@@ -112,17 +114,19 @@ func TestCredentials_CanPurchase(t *testing.T) {
 
 	// With kbsync
 	creds.SetKbsync("test_kbsync")
+
 	if !creds.CanPurchase() {
 		t.Error("Credentials with kbsync should be able to purchase")
 	}
 
 	// Not authenticated
-	creds2, err := valueobject.NewCredentials("test@example.com")
+	creds2, err := valueobject.NewCredentials(testAppleID)
 	if err != nil {
 		t.Fatalf("Failed to create credentials: %v", err)
 	}
 
 	creds2.SetKbsync("test_kbsync")
+
 	if creds2.CanPurchase() {
 		t.Error("Unauthenticated credentials should not be able to purchase")
 	}
@@ -131,12 +135,12 @@ func TestCredentials_CanPurchase(t *testing.T) {
 func TestCredentials_Equals(t *testing.T) {
 	t.Parallel()
 
-	creds1, err := valueobject.NewCredentialsWithTokens("test@example.com", "token", "123")
+	creds1, err := valueobject.NewCredentialsWithTokens(testAppleID, "token", "123")
 	if err != nil {
 		t.Fatalf("Failed to create credentials1: %v", err)
 	}
 
-	creds2, err := valueobject.NewCredentialsWithTokens("test@example.com", "token", "123")
+	creds2, err := valueobject.NewCredentialsWithTokens(testAppleID, "token", "123")
 	if err != nil {
 		t.Fatalf("Failed to create credentials2: %v", err)
 	}

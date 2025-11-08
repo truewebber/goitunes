@@ -33,8 +33,10 @@ func (s *CurrencyService) FormatPrice(price float64, currency string) string {
 	if price == 0 {
 		return "Free"
 	}
+
 	if currency == "" {
 		return "0"
 	}
+
 	return currency
 }

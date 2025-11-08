@@ -54,15 +54,17 @@ func (c *ChartClient) GetTop200(
 
 	popID := c.chartTypeToPopID(chartType)
 
-	req, err := http.NewRequestWithContext(ctx, http.MethodGet, config.Top200AppsURL, nil)
+	req, err := http.NewRequestWithContext(ctx, http.MethodGet, config.Top200AppsURL, http.NoBody)
 	if err != nil {
 		return nil, fmt.Errorf("failed to create request: %w", err)
 	}
 
 	q := req.URL.Query()
+
 	if kidPrefix != "" {
 		q.Add("ageBandId", kidPrefix)
 	}
+
 	q.Add("genreId", genreID)
 	q.Add("popId", popID)
 	q.Add("cc", c.store.Region())
@@ -75,10 +77,16 @@ func (c *ChartClient) GetTop200(
 	if err != nil {
 		return nil, fmt.Errorf("failed to send request: %w", err)
 	}
-	defer resp.Body.Close()
+
+	defer func() {
+		if closeErr := resp.Body.Close(); closeErr != nil {
+			// Log error but don't fail the function
+			_ = closeErr
+		}
+	}()
 
 	if resp.StatusCode != http.StatusOK {
-		return nil, fmt.Errorf("unexpected status code: %d", resp.StatusCode)
+		return nil, fmt.Errorf("%w: %d", ErrUnexpectedStatusCode, resp.StatusCode)
 	}
 
 	data, err := io.ReadAll(resp.Body)
@@ -108,6 +116,7 @@ func (c *ChartClient) GetTop200(
 
 	// Collect missing adamIDs
 	var needGetInfo []string
+
 	for i := from - 1; i < fromToChunk; i++ {
 		if _, ok := topResults[adamIDs[i]]; !ok {
 			needGetInfo = append(needGetInfo, adamIDs[i])
@@ -136,6 +145,7 @@ func (c *ChartClient) GetTop200(
 
 	// Build chart items
 	var chartItems []*entity.ChartItem
+
 	for i := from - 1; i < fromToChunk; i++ {
 		position := i + 1
 		adamID := adamIDs[i]
@@ -174,7 +184,7 @@ func (c *ChartClient) GetTop1500(
 
 	requestURL := fmt.Sprintf("%s?%s", config.TopAppsURL, q.Encode())
 
-	req, err := http.NewRequestWithContext(ctx, http.MethodGet, requestURL, nil)
+	req, err := http.NewRequestWithContext(ctx, http.MethodGet, requestURL, http.NoBody)
 	if err != nil {
 		return nil, fmt.Errorf("failed to create request: %w", err)
 	}
@@ -185,10 +195,16 @@ func (c *ChartClient) GetTop1500(
 	if err != nil {
 		return nil, fmt.Errorf("failed to send request: %w", err)
 	}
-	defer resp.Body.Close()
+
+	defer func() {
+		if closeErr := resp.Body.Close(); closeErr != nil {
+			// Log error but don't fail the function
+			_ = closeErr
+		}
+	}()
 
 	if resp.StatusCode != http.StatusOK {
-		return nil, fmt.Errorf("unexpected status code: %d", resp.StatusCode)
+		return nil, fmt.Errorf("%w: %d", ErrUnexpectedStatusCode, resp.StatusCode)
 	}
 
 	data, err := io.ReadAll(resp.Body)
@@ -202,21 +218,36 @@ func (c *ChartClient) GetTop1500(
 	}
 
 	if len(response) != 1 {
-		return nil, fmt.Errorf("unexpected response structure")
+		return nil, ErrUnexpectedResponseStructure
 	}
 
 	var chartItems []*entity.ChartItem
+
 	for i, item := range response[0].ContentData {
 		position := page*pageSize + i + 1
-		rating, _ := strconv.ParseFloat(item.UserRating, 64)
 
-		buyParams, _ := url.ParseQuery(item.BuyData.ActionParams)
-		paramPrice, _ := strconv.ParseInt(buyParams.Get("price"), 10, 64)
+		rating, err := strconv.ParseFloat(item.UserRating, 64)
+		if err != nil {
+			rating = 0
+		}
+
+		buyParams, err := url.ParseQuery(item.BuyData.ActionParams)
+		if err != nil {
+			buyParams = url.Values{}
+		}
+
+		paramPrice, err := strconv.ParseInt(buyParams.Get("price"), 10, 64)
+		if err != nil {
+			paramPrice = 0
+		}
 
 		currency := c.currencyService.ExtractCurrency(float64(paramPrice), item.ButtonText)
 		price := float64(paramPrice) / 1000
 
-		versionID, _ := strconv.ParseInt(item.BuyData.VersionID, 10, 64)
+		versionID, err := strconv.ParseInt(item.BuyData.VersionID, 10, 64)
+		if err != nil {
+			versionID = 0
+		}
 
 		app := entity.NewApplication(item.ID, item.BuyData.BundleID, "")
 		app.SetPrice(price, currency)
@@ -272,11 +303,13 @@ func (c *ChartClient) mapAppItemToEntity(item model.AppItemResponse) *entity.App
 	}
 
 	var screenshots []string
+
 	for _, screenList := range item.ScreenshotsByType {
 		for _, screen := range screenList {
 			screenshots = append(screenshots, screen.URL)
 		}
 	}
+
 	if len(screenshots) > 0 {
 		app.SetScreenshotURLs(screenshots)
 	}

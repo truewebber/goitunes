@@ -42,7 +42,7 @@ func (c *AuthClient) Authenticate(
 	appleID, password string,
 ) (*valueobject.Credentials, error) {
 	if password == "" {
-		return nil, fmt.Errorf("password cannot be empty")
+		return nil, ErrEmptyPassword
 	}
 
 	loginURL := fmt.Sprintf(config.LoginURLTemplate, c.store.HostPrefix())
@@ -62,10 +62,16 @@ func (c *AuthClient) Authenticate(
 	if err != nil {
 		return nil, fmt.Errorf("failed to send request: %w", err)
 	}
-	defer resp.Body.Close()
+
+	defer func() {
+		if closeErr := resp.Body.Close(); closeErr != nil {
+			// Log error but don't fail the function
+			_ = closeErr
+		}
+	}()
 
 	if resp.StatusCode != http.StatusOK {
-		return nil, fmt.Errorf("authentication failed with status code: %d", resp.StatusCode)
+		return nil, fmt.Errorf("%w: %d", ErrUnexpectedStatusCode, resp.StatusCode)
 	}
 
 	data, err := io.ReadAll(resp.Body)
@@ -74,15 +80,17 @@ func (c *AuthClient) Authenticate(
 	}
 
 	var authResp model.AuthResponse
+
 	if err := plist.Unmarshal(data, &authResp); err != nil {
 		return nil, fmt.Errorf("failed to unmarshal response: %w", err)
 	}
 
 	if authResp.PasswordToken == "" {
-		return nil, fmt.Errorf("password token not found in response")
+		return nil, ErrPasswordTokenNotFound
 	}
+
 	if authResp.DSID == "" {
-		return nil, fmt.Errorf("DSID not found in response")
+		return nil, ErrDSIDNotFound
 	}
 
 	credentials, err := valueobject.NewCredentialsWithTokens(appleID, authResp.PasswordToken, authResp.DSID)

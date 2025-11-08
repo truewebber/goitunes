@@ -2,9 +2,9 @@ package entity
 
 // ChartItem represents an application in a chart position.
 type ChartItem struct {
-	position    int
 	application *Application
 	chartType   ChartType
+	position    int
 }
 
 // ChartType represents the type of chart.

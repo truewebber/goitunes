@@ -1,7 +1,5 @@
 package valueobject
 
-import "fmt"
-
 // Device represents a device configuration for App Store requests.
 type Device struct {
 	guid        string
@@ -12,13 +10,15 @@ type Device struct {
 // NewDevice creates a new Device value object.
 func NewDevice(guid, machineName, userAgent string) (*Device, error) {
 	if guid == "" {
-		return nil, fmt.Errorf("guid cannot be empty")
+		return nil, ErrEmptyGUID
 	}
+
 	if machineName == "" {
-		return nil, fmt.Errorf("machineName cannot be empty")
+		return nil, ErrEmptyMachineName
 	}
+
 	if userAgent == "" {
-		return nil, fmt.Errorf("userAgent cannot be empty")
+		return nil, ErrEmptyUserAgent
 	}
 
 	return &Device{
@@ -28,16 +28,21 @@ func NewDevice(guid, machineName, userAgent string) (*Device, error) {
 	}, nil
 }
 
-// Getters.
-func (d *Device) GUID() string        { return d.guid }
+// GUID returns the device GUID.
+func (d *Device) GUID() string { return d.guid }
+
+// MachineName returns the machine name.
 func (d *Device) MachineName() string { return d.machineName }
-func (d *Device) UserAgent() string   { return d.userAgent }
+
+// UserAgent returns the user agent.
+func (d *Device) UserAgent() string { return d.userAgent }
 
 // Equals checks if two devices are equal.
 func (d *Device) Equals(other *Device) bool {
 	if other == nil {
 		return false
 	}
+
 	return d.guid == other.guid &&
 		d.machineName == other.machineName &&
 		d.userAgent == other.userAgent
