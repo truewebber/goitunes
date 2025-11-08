@@ -1,6 +1,6 @@
 package dto
 
-// GetTopChartsRequest represents a request to get top charts
+// GetTopChartsRequest represents a request to get top charts.
 type GetTopChartsRequest struct {
 	GenreID    string
 	ChartType  string // "topfree", "toppaid", "topgrossing"
@@ -11,27 +11,26 @@ type GetTopChartsRequest struct {
 	Page       int    // For Top1500: page number (0-based)
 }
 
-// GetApplicationInfoRequest represents a request to get application info
+// GetApplicationInfoRequest represents a request to get application info.
 type GetApplicationInfoRequest struct {
 	AdamIDs   []string
 	BundleIDs []string
 }
 
-// GetRatingRequest represents a request to get rating information
+// GetRatingRequest represents a request to get rating information.
 type GetRatingRequest struct {
 	AdamID  string
 	Overall bool // If true, get overall rating from open API
 }
 
-// AuthenticateRequest represents an authentication request
+// AuthenticateRequest represents an authentication request.
 type AuthenticateRequest struct {
 	AppleID  string
 	Password string
 }
 
-// PurchaseRequest represents a purchase request
+// PurchaseRequest represents a purchase request.
 type PurchaseRequest struct {
 	AdamID    string
 	VersionID int64
 }
-

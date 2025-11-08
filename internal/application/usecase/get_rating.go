@@ -8,22 +8,24 @@ import (
 	"github.com/truewebber/goitunes/v2/internal/domain/repository"
 )
 
-// GetRating retrieves rating information for an application
+// GetRating retrieves rating information for an application.
 type GetRating struct {
 	appRepo repository.ApplicationRepository
 }
 
-// NewGetRating creates a new GetRating use case
+// NewGetRating creates a new GetRating use case.
 func NewGetRating(appRepo repository.ApplicationRepository) *GetRating {
 	return &GetRating{
 		appRepo: appRepo,
 	}
 }
 
-// Execute retrieves rating information
+// Execute retrieves rating information.
 func (uc *GetRating) Execute(ctx context.Context, req dto.GetRatingRequest) (*dto.GetRatingResponse, error) {
 	var rating float64
+
 	var count int
+
 	var err error
 
 	if req.Overall {

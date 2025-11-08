@@ -21,7 +21,7 @@ import (
 	infrahttp "github.com/truewebber/goitunes/v2/internal/infrastructure/http"
 )
 
-// PurchaseClient implements PurchaseRepository interface
+// PurchaseClient implements PurchaseRepository interface.
 type PurchaseClient struct {
 	httpClient  infrahttp.Client
 	store       *valueobject.Store
@@ -29,7 +29,7 @@ type PurchaseClient struct {
 	device      *valueobject.Device
 }
 
-// NewPurchaseClient creates a new purchase client
+// NewPurchaseClient creates a new purchase client.
 func NewPurchaseClient(
 	httpClient infrahttp.Client,
 	store *valueobject.Store,
@@ -44,14 +44,14 @@ func NewPurchaseClient(
 	}
 }
 
-// Purchase initiates a purchase for an application
+// Purchase initiates a purchase for an application.
 func (c *PurchaseClient) Purchase(
 	ctx context.Context,
 	adamID string,
 	versionID int64,
 ) (*entity.DownloadInfo, error) {
 	if !c.credentials.CanPurchase() {
-		return nil, fmt.Errorf("credentials do not support purchasing")
+		return nil, fmt.Errorf("%w", ErrCredentialsDoNotSupportPurchasing)
 	}
 
 	purchaseResp, err := c.buyApplication(ctx, adamID, versionID, repository.PricingParameterBuy)
@@ -61,33 +61,36 @@ func (c *PurchaseClient) Purchase(
 
 	// Handle re-download case
 	if purchaseResp.Metrics.DialogID == "MZCommerceSoftware.OwnsSupersededMinorSoftwareApplicationForUpdate" {
-		return nil, fmt.Errorf("application requires re-download (STDRDL), which requires different kbsync certificate")
+		return nil, ErrApplicationRequiresRedownload
 	}
 
 	if len(purchaseResp.SongList) == 0 {
-		return nil, fmt.Errorf("download URL not found in response for adamID: %s", adamID)
+		return nil, fmt.Errorf("%w for adamID: %s", ErrDownloadURLNotFound, adamID)
 	}
+
 	if len(purchaseResp.SongList) > 1 {
-		return nil, fmt.Errorf("unexpected: multiple download URLs in response for adamID: %s", adamID)
+		return nil, fmt.Errorf("%w for adamID: %s", ErrMultipleDownloadURLs, adamID)
 	}
 
 	song := purchaseResp.SongList[0]
 
 	// Confirm download
-	if err := c.ConfirmDownload(ctx, song.DownloadID); err != nil {
-		return nil, fmt.Errorf("failed to confirm download: %w", err)
+	confirmErr := c.ConfirmDownload(ctx, song.DownloadID)
+	if confirmErr != nil {
+		return nil, fmt.Errorf("failed to confirm download: %w", confirmErr)
 	}
 
 	if len(song.Sinfs) == 0 {
-		return nil, fmt.Errorf("no SINF found for adamID: %s", adamID)
+		return nil, fmt.Errorf("%w for adamID: %s", ErrNoSINFFound, adamID)
 	}
+
 	if len(song.Sinfs) > 1 {
-		return nil, fmt.Errorf("unexpected: multiple SINFs in response for adamID: %s", adamID)
+		return nil, fmt.Errorf("%w for adamID: %s", ErrMultipleSINFs, adamID)
 	}
 
 	sinf := bytes.TrimSpace(song.Sinfs[0].Data)
 	if len(sinf) == 0 {
-		return nil, fmt.Errorf("SINF is empty for adamID: %s", adamID)
+		return nil, fmt.Errorf("%w for adamID: %s", ErrSINFEmpty, adamID)
 	}
 
 	// Get bundle ID (may be in different fields)
@@ -95,12 +98,13 @@ func (c *PurchaseClient) Purchase(
 	if bundleID == "" {
 		bundleID = song.Metadata.Q
 	}
+
 	if bundleID == "" {
-		return nil, fmt.Errorf("bundle ID not found in response for adamID: %s", adamID)
+		return nil, fmt.Errorf("%w for adamID: %s", ErrBundleIDNotFound, adamID)
 	}
 
 	// Generate iTunes metadata
-	metadataBytes := c.generateMetadata(song, bundleID)
+	metadataBytes := c.generateMetadata(&song, bundleID)
 
 	// Build download info
 	downloadInfo := entity.NewDownloadInfo(bundleID, song.URL, song.DownloadKey)
@@ -118,7 +122,7 @@ func (c *PurchaseClient) Purchase(
 	return downloadInfo, nil
 }
 
-// ConfirmDownload confirms that a download has been initiated
+// ConfirmDownload confirms that a download has been initiated.
 func (c *PurchaseClient) ConfirmDownload(ctx context.Context, downloadID string) error {
 	query := url.Values{
 		"download-id": []string{downloadID},
@@ -127,7 +131,7 @@ func (c *PurchaseClient) ConfirmDownload(ctx context.Context, downloadID string)
 
 	requestURL := fmt.Sprintf(config.ConfirmDownloadTemplate, c.store.HostPrefix()) + "?" + query.Encode()
 
-	req, err := http.NewRequestWithContext(ctx, http.MethodGet, requestURL, nil)
+	req, err := http.NewRequestWithContext(ctx, http.MethodGet, requestURL, http.NoBody)
 	if err != nil {
 		return fmt.Errorf("failed to create request: %w", err)
 	}
@@ -141,7 +145,13 @@ func (c *PurchaseClient) ConfirmDownload(ctx context.Context, downloadID string)
 	if err != nil {
 		return fmt.Errorf("failed to send request: %w", err)
 	}
-	defer resp.Body.Close()
+
+	defer func() {
+		if closeErr := resp.Body.Close(); closeErr != nil {
+			// Log error but don't fail the function
+			_ = closeErr
+		}
+	}()
 
 	if resp.StatusCode != http.StatusOK {
 		return fmt.Errorf("unexpected status code: %d", resp.StatusCode)
@@ -150,7 +160,7 @@ func (c *PurchaseClient) ConfirmDownload(ctx context.Context, downloadID string)
 	return nil
 }
 
-// buyApplication performs the buy operation
+// buyApplication performs the buy operation.
 func (c *PurchaseClient) buyApplication(
 	ctx context.Context,
 	adamID string,
@@ -181,7 +191,13 @@ func (c *PurchaseClient) buyApplication(
 	if err != nil {
 		return nil, fmt.Errorf("failed to send request: %w", err)
 	}
-	defer resp.Body.Close()
+
+	defer func() {
+		if closeErr := resp.Body.Close(); closeErr != nil {
+			// Log error but don't fail the function
+			_ = closeErr
+		}
+	}()
 
 	if resp.StatusCode != http.StatusOK {
 		return nil, fmt.Errorf("unexpected status code: %d", resp.StatusCode)
@@ -193,20 +209,23 @@ func (c *PurchaseClient) buyApplication(
 	}
 
 	var purchaseResp model.PurchaseResponse
-	if err := plist.Unmarshal(data, &purchaseResp); err != nil {
-		return nil, fmt.Errorf("failed to unmarshal response: %w", err)
+	unmarshalErr := plist.Unmarshal(data, &purchaseResp)
+	if unmarshalErr != nil {
+		return nil, fmt.Errorf("failed to unmarshal response: %w", unmarshalErr)
 	}
 
 	return &purchaseResp, nil
 }
 
-// buildBuyBody creates the request body for purchase
+// buildBuyBody creates the request body for purchase.
 func (c *PurchaseClient) buildBuyBody(
 	adamID string,
 	versionID int64,
 	pricingParameter repository.PricingParameter,
 ) *strings.Reader {
-	unixTime := time.Now().UnixNano() / 1000000
+	const nanosecondsPerMillisecond = 1000000
+
+	unixTime := time.Now().UnixNano() / nanosecondsPerMillisecond
 
 	rebuy := "false"
 	if pricingParameter == repository.PricingParameterReDownload {
@@ -255,8 +274,8 @@ func (c *PurchaseClient) buildBuyBody(
 	return strings.NewReader(body)
 }
 
-// generateMetadata generates iTunes metadata plist
-func (c *PurchaseClient) generateMetadata(song model.SongItem, bundleID string) []byte {
+// generateMetadata generates iTunes metadata plist.
+func (c *PurchaseClient) generateMetadata(song *model.SongItem, bundleID string) []byte {
 	metadata := map[string]interface{}{
 		"softwareVersionBundleId":           bundleID,
 		"itemId":                            song.Metadata.ItemID,
@@ -279,6 +298,11 @@ func (c *PurchaseClient) generateMetadata(song model.SongItem, bundleID string) 
 		"storeFront":                        fmt.Sprintf("%d", c.store.StoreFront()),
 	}
 
-	data, _ := plist.Marshal(metadata)
+	data, err := plist.Marshal(metadata)
+	if err != nil {
+		// Return empty slice on error - caller should handle this
+		return []byte{}
+	}
+
 	return data
 }

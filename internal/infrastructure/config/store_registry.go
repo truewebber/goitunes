@@ -6,39 +6,42 @@ import (
 	"github.com/truewebber/goitunes/v2/internal/domain/valueobject"
 )
 
-// StoreRegistry manages available App Store regions
+// StoreRegistry manages available App Store regions.
 type StoreRegistry struct {
 	stores map[string]*valueobject.Store
 }
 
-// NewStoreRegistry creates a new store registry with all supported regions
+// NewStoreRegistry creates a new store registry with all supported regions.
 func NewStoreRegistry() *StoreRegistry {
 	registry := &StoreRegistry{
 		stores: make(map[string]*valueobject.Store),
 	}
 	registry.initialize()
+
 	return registry
 }
 
-// GetStore returns a store by region code
+// GetStore returns a store by region code.
 func (r *StoreRegistry) GetStore(region string) (*valueobject.Store, error) {
 	store, exists := r.stores[region]
 	if !exists {
 		return nil, fmt.Errorf("unsupported region: %s", region)
 	}
+
 	return store, nil
 }
 
-// GetAllRegions returns all supported region codes
+// GetAllRegions returns all supported region codes.
 func (r *StoreRegistry) GetAllRegions() []string {
 	regions := make([]string, 0, len(r.stores))
 	for region := range r.stores {
 		regions = append(regions, region)
 	}
+
 	return regions
 }
 
-// initialize populates the registry with all supported stores
+// initialize populates the registry with all supported stores.
 func (r *StoreRegistry) initialize() {
 	stores := []struct {
 		region     string
@@ -77,7 +80,9 @@ func (r *StoreRegistry) initialize() {
 	}
 
 	for _, s := range stores {
-		store, _ := valueobject.NewStore(s.region, s.storeFront, s.hostPrefix)
-		r.stores[s.region] = store
+		store, err := valueobject.NewStore(s.region, s.storeFront, s.hostPrefix)
+		if err == nil {
+			r.stores[s.region] = store
+		}
 	}
 }

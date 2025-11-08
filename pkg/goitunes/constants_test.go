@@ -92,7 +92,7 @@ func TestGenreNames_AllGenresHaveNames(t *testing.T) {
 		// Main
 		GenreAll, GenreGames, GenreShopping, GenreMagazinesNewspapers,
 		GenreEducation, GenreBusiness, GenreKids, GenreFoodDrink,
-		GenreHealthFitness, GenreCatalogues, GenreBooks, GenreMedical,
+		GenreHealthFitness, GenreCatalogs, GenreBooks, GenreMedical,
 		GenreMusic, GenreNavigation, GenreNews, GenreLifestyle,
 		GenreWeather, GenreProductivity, GenreTravel, GenreEntertainment,
 		GenreSocialNetworking, GenreSports, GenreReference, GenreUtilities,

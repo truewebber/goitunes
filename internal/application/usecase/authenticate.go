@@ -8,25 +8,26 @@ import (
 	"github.com/truewebber/goitunes/v2/internal/domain/repository"
 )
 
-// Authenticate performs user authentication
+// Authenticate performs user authentication.
 type Authenticate struct {
 	authRepo repository.AuthRepository
 }
 
-// NewAuthenticate creates a new Authenticate use case
+// NewAuthenticate creates a new Authenticate use case.
 func NewAuthenticate(authRepo repository.AuthRepository) *Authenticate {
 	return &Authenticate{
 		authRepo: authRepo,
 	}
 }
 
-// Execute performs authentication
+// Execute performs authentication.
 func (uc *Authenticate) Execute(ctx context.Context, req dto.AuthenticateRequest) (*dto.AuthenticateResponse, error) {
 	if req.AppleID == "" {
-		return nil, fmt.Errorf("appleID cannot be empty")
+		return nil, ErrEmptyAppleID
 	}
+
 	if req.Password == "" {
-		return nil, fmt.Errorf("password cannot be empty")
+		return nil, ErrEmptyPassword
 	}
 
 	credentials, err := uc.authRepo.Authenticate(ctx, req.AppleID, req.Password)

@@ -2,7 +2,7 @@ package dto
 
 import "time"
 
-// ApplicationDTO represents application data transfer object
+// ApplicationDTO represents application data transfer object.
 type ApplicationDTO struct {
 	AdamID           string    `json:"adamId"`
 	BundleID         string    `json:"bundleId"`
@@ -28,13 +28,13 @@ type ApplicationDTO struct {
 	IsUniversal      bool      `json:"isUniversal"`
 }
 
-// ChartItemDTO represents a chart item data transfer object
+// ChartItemDTO represents a chart item data transfer object.
 type ChartItemDTO struct {
 	Position int            `json:"position"`
 	App      ApplicationDTO `json:"app"`
 }
 
-// DownloadInfoDTO represents download information data transfer object
+// DownloadInfoDTO represents download information data transfer object.
 type DownloadInfoDTO struct {
 	BundleID    string            `json:"bundleId"`
 	URL         string            `json:"url"`

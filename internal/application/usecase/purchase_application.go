@@ -9,13 +9,13 @@ import (
 	"github.com/truewebber/goitunes/v2/internal/domain/repository"
 )
 
-// PurchaseApplication handles application purchase
+// PurchaseApplication handles application purchase.
 type PurchaseApplication struct {
 	purchaseRepo repository.PurchaseRepository
 	mapper       *mapper.ApplicationMapper
 }
 
-// NewPurchaseApplication creates a new PurchaseApplication use case
+// NewPurchaseApplication creates a new PurchaseApplication use case.
 func NewPurchaseApplication(purchaseRepo repository.PurchaseRepository) *PurchaseApplication {
 	return &PurchaseApplication{
 		purchaseRepo: purchaseRepo,
@@ -23,13 +23,14 @@ func NewPurchaseApplication(purchaseRepo repository.PurchaseRepository) *Purchas
 	}
 }
 
-// Execute performs the purchase
+// Execute performs the purchase.
 func (uc *PurchaseApplication) Execute(ctx context.Context, req dto.PurchaseRequest) (*dto.PurchaseResponse, error) {
 	if req.AdamID == "" {
-		return nil, fmt.Errorf("adamID cannot be empty")
+		return nil, ErrEmptyAdamID
 	}
+
 	if req.VersionID <= 0 {
-		return nil, fmt.Errorf("versionID must be positive")
+		return nil, ErrInvalidVersionID
 	}
 
 	downloadInfo, err := uc.purchaseRepo.Purchase(ctx, req.AdamID, req.VersionID)

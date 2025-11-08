@@ -1,25 +1,26 @@
 package goitunes
 
-// Genre represents an App Store genre/category identifier
+// Genre represents an App Store genre/category identifier.
 type Genre string
 
-// String returns the string representation of the genre ID
+// String returns the string representation of the genre ID.
 func (g Genre) String() string {
 	return string(g)
 }
 
-// IsValid checks if the genre is a valid known genre
+// IsValid checks if the genre is a valid known genre.
 func (g Genre) IsValid() bool {
 	_, exists := genreNames[g]
+
 	return exists
 }
 
-// Name returns the human-readable name of the genre
+// Name returns the human-readable name of the genre.
 func (g Genre) Name() string {
 	return genreNames[g]
 }
 
-// Main App Store genres
+// Main App Store genres.
 const (
 	GenreAll                 Genre = "36"   // All categories
 	GenreGames               Genre = "6014" // Games
@@ -30,7 +31,7 @@ const (
 	GenreKids                Genre = "KIDS" // Kids
 	GenreFoodDrink           Genre = "6023" // Food & Drink
 	GenreHealthFitness       Genre = "6013" // Health & Fitness
-	GenreCatalogues          Genre = "6022" // Catalogues
+	GenreCatalogs            Genre = "6022" // Catalogs
 	GenreBooks               Genre = "6018" // Books
 	GenreMedical             Genre = "6020" // Medical
 	GenreMusic               Genre = "6011" // Music
@@ -120,7 +121,7 @@ var genreNames = map[Genre]string{
 	GenreKids:                "Kids",
 	GenreFoodDrink:           "Food & Drink",
 	GenreHealthFitness:       "Health & Fitness",
-	GenreCatalogues:          "Catalogues",
+	GenreCatalogs:            "Catalogs",
 	GenreBooks:               "Books",
 	GenreMedical:             "Medical",
 	GenreMusic:               "Music",

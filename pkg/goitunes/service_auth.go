@@ -2,6 +2,7 @@ package goitunes
 
 import (
 	"context"
+	"fmt"
 
 	"github.com/truewebber/goitunes/v2/internal/application/dto"
 	"github.com/truewebber/goitunes/v2/internal/application/usecase"
@@ -9,14 +10,14 @@ import (
 	"github.com/truewebber/goitunes/v2/internal/infrastructure/appstore"
 )
 
-// AuthService provides authentication methods
+// AuthService provides authentication methods.
 type AuthService struct {
 	useCase *usecase.Authenticate
 	client  *Client
 }
 
-// Login performs authentication with Apple ID and password
-// After successful login, the client will be authenticated and can use purchase methods
+// Login performs authentication with Apple ID and password.
+// After successful login, the client will be authenticated and can use purchase methods.
 func (s *AuthService) Login(ctx context.Context, password string) (*dto.AuthenticateResponse, error) {
 	if s.client.credentials == nil {
 		return nil, ErrInvalidCredentials
@@ -29,7 +30,7 @@ func (s *AuthService) Login(ctx context.Context, password string) (*dto.Authenti
 
 	resp, err := s.useCase.Execute(ctx, req)
 	if err != nil {
-		return nil, err
+		return nil, fmt.Errorf("failed to authenticate: %w", err)
 	}
 
 	// Update client credentials with tokens
@@ -39,7 +40,7 @@ func (s *AuthService) Login(ctx context.Context, password string) (*dto.Authenti
 		resp.DSID,
 	)
 	if err != nil {
-		return nil, err
+		return nil, fmt.Errorf("failed to create credentials with tokens: %w", err)
 	}
 
 	// Copy kbsync if it exists
@@ -72,7 +73,7 @@ func (s *AuthService) Login(ctx context.Context, password string) (*dto.Authenti
 	return resp, nil
 }
 
-// IsAuthenticated returns true if the client is authenticated
+// IsAuthenticated returns true if the client is authenticated.
 func (s *AuthService) IsAuthenticated() bool {
 	return s.client.IsAuthenticated()
 }

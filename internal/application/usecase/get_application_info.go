@@ -10,13 +10,13 @@ import (
 	"github.com/truewebber/goitunes/v2/internal/domain/repository"
 )
 
-// GetApplicationInfo retrieves application information
+// GetApplicationInfo retrieves application information.
 type GetApplicationInfo struct {
 	appRepo repository.ApplicationRepository
 	mapper  *mapper.ApplicationMapper
 }
 
-// NewGetApplicationInfo creates a new GetApplicationInfo use case
+// NewGetApplicationInfo creates a new GetApplicationInfo use case.
 func NewGetApplicationInfo(appRepo repository.ApplicationRepository) *GetApplicationInfo {
 	return &GetApplicationInfo{
 		appRepo: appRepo,
@@ -24,9 +24,13 @@ func NewGetApplicationInfo(appRepo repository.ApplicationRepository) *GetApplica
 	}
 }
 
-// Execute retrieves application information
-func (uc *GetApplicationInfo) Execute(ctx context.Context, req dto.GetApplicationInfoRequest) (*dto.GetApplicationInfoResponse, error) {
+// Execute retrieves application information.
+func (uc *GetApplicationInfo) Execute(
+	ctx context.Context,
+	req dto.GetApplicationInfoRequest,
+) (*dto.GetApplicationInfoResponse, error) {
 	var apps []*entity.Application
+
 	var err error
 
 	if len(req.AdamIDs) > 0 {
@@ -40,7 +44,7 @@ func (uc *GetApplicationInfo) Execute(ctx context.Context, req dto.GetApplicatio
 			return nil, fmt.Errorf("failed to find apps by bundleID: %w", err)
 		}
 	} else {
-		return nil, fmt.Errorf("either adamIDs or bundleIDs must be provided")
+		return nil, ErrMissingIdentifiers
 	}
 
 	return &dto.GetApplicationInfoResponse{

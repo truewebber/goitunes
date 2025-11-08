@@ -10,13 +10,13 @@ import (
 	"github.com/truewebber/goitunes/v2/internal/domain/repository"
 )
 
-// GetTopCharts retrieves top charts based on the request
+// GetTopCharts retrieves top charts based on the request.
 type GetTopCharts struct {
 	chartRepo repository.ChartRepository
 	mapper    *mapper.ApplicationMapper
 }
 
-// NewGetTopCharts creates a new GetTopCharts use case
+// NewGetTopCharts creates a new GetTopCharts use case.
 func NewGetTopCharts(chartRepo repository.ChartRepository) *GetTopCharts {
 	return &GetTopCharts{
 		chartRepo: chartRepo,
@@ -24,11 +24,12 @@ func NewGetTopCharts(chartRepo repository.ChartRepository) *GetTopCharts {
 	}
 }
 
-// Execute retrieves top charts
+// Execute retrieves top charts.
 func (uc *GetTopCharts) Execute(ctx context.Context, req dto.GetTopChartsRequest) (*dto.GetTopChartsResponse, error) {
 	chartType := uc.parseChartType(req.ChartType)
 
 	var items []*entity.ChartItem
+
 	var err error
 
 	// Determine which endpoint to use based on request
@@ -38,6 +39,7 @@ func (uc *GetTopCharts) Execute(ctx context.Context, req dto.GetTopChartsRequest
 		if page < 0 {
 			page = 0
 		}
+
 		pageSize := req.MaxResults
 		if pageSize <= 0 {
 			pageSize = 100
@@ -50,6 +52,7 @@ func (uc *GetTopCharts) Execute(ctx context.Context, req dto.GetTopChartsRequest
 		if from < 1 {
 			from = 1
 		}
+
 		limit := req.Limit
 		if limit <= 0 {
 			limit = 200
@@ -68,7 +71,7 @@ func (uc *GetTopCharts) Execute(ctx context.Context, req dto.GetTopChartsRequest
 	}, nil
 }
 
-// parseChartType converts string to ChartType
+// parseChartType converts string to ChartType.
 func (uc *GetTopCharts) parseChartType(chartType string) entity.ChartType {
 	switch chartType {
 	case "topfree":

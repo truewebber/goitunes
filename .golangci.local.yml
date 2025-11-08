@@ -1,0 +1,3 @@
+# Project-specific golangci-lint configuration for truerpc-landing
+# This file contains only project-specific overrides and will be merged with base config
+# GOLANGCI_LINT_REMOTE_CONFIG: https://raw.githubusercontent.com/truewebber/golangci-config/main/.golangci.yml

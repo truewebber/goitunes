@@ -5,15 +5,15 @@ import (
 	"github.com/truewebber/goitunes/v2/internal/domain/entity"
 )
 
-// ApplicationMapper handles mapping between domain entities and DTOs
+// ApplicationMapper handles mapping between domain entities and DTOs.
 type ApplicationMapper struct{}
 
-// NewApplicationMapper creates a new application mapper
+// NewApplicationMapper creates a new application mapper.
 func NewApplicationMapper() *ApplicationMapper {
 	return &ApplicationMapper{}
 }
 
-// ToDTO maps an Application entity to ApplicationDTO
+// ToDTO maps an Application entity to ApplicationDTO.
 func (m *ApplicationMapper) ToDTO(app *entity.Application) dto.ApplicationDTO {
 	return dto.ApplicationDTO{
 		AdamID:           app.AdamID(),
@@ -41,16 +41,17 @@ func (m *ApplicationMapper) ToDTO(app *entity.Application) dto.ApplicationDTO {
 	}
 }
 
-// ToDTOList maps a list of Application entities to DTOs
+// ToDTOList maps a list of Application entities to DTOs.
 func (m *ApplicationMapper) ToDTOList(apps []*entity.Application) []dto.ApplicationDTO {
 	dtos := make([]dto.ApplicationDTO, 0, len(apps))
 	for _, app := range apps {
 		dtos = append(dtos, m.ToDTO(app))
 	}
+
 	return dtos
 }
 
-// ChartItemToDTO maps a ChartItem entity to ChartItemDTO
+// ChartItemToDTO maps a ChartItem entity to ChartItemDTO.
 func (m *ApplicationMapper) ChartItemToDTO(item *entity.ChartItem) dto.ChartItemDTO {
 	return dto.ChartItemDTO{
 		Position: item.Position(),
@@ -58,16 +59,17 @@ func (m *ApplicationMapper) ChartItemToDTO(item *entity.ChartItem) dto.ChartItem
 	}
 }
 
-// ChartItemsToDTOList maps a list of ChartItem entities to DTOs
+// ChartItemsToDTOList maps a list of ChartItem entities to DTOs.
 func (m *ApplicationMapper) ChartItemsToDTOList(items []*entity.ChartItem) []dto.ChartItemDTO {
 	dtos := make([]dto.ChartItemDTO, 0, len(items))
 	for _, item := range items {
 		dtos = append(dtos, m.ChartItemToDTO(item))
 	}
+
 	return dtos
 }
 
-// DownloadInfoToDTO maps a DownloadInfo entity to DownloadInfoDTO
+// DownloadInfoToDTO maps a DownloadInfo entity to DownloadInfoDTO.
 func (m *ApplicationMapper) DownloadInfoToDTO(info *entity.DownloadInfo) dto.DownloadInfoDTO {
 	return dto.DownloadInfoDTO{
 		BundleID:    info.BundleID(),

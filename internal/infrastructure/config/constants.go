@@ -1,13 +1,13 @@
 package config
 
-// HTTP constants
+// HTTP constants.
 const (
 	ContentTypeJSON        = "application/json"
 	ContentTypeFormEncoded = "application/x-www-form-urlencoded"
 	ContentTypePlist       = "application/x-apple-plist"
 )
 
-// Header keys
+// Header keys.
 const (
 	HeaderUserAgent        = "User-Agent"
 	HeaderContentType      = "Content-Type"
@@ -19,7 +19,7 @@ const (
 	HeaderCookie           = "Cookie"
 )
 
-// Request parameters
+// Request parameters.
 const (
 	DefaultTimeZone = "0" // UTC
 )

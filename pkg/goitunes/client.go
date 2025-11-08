@@ -10,7 +10,7 @@ import (
 	infrahttp "github.com/truewebber/goitunes/v2/internal/infrastructure/http"
 )
 
-// Client is the main entry point for the goitunes library
+// Client is the main entry point for the goitunes library.
 type Client struct {
 	store         *valueobject.Store
 	httpClient    infrahttp.Client
@@ -31,7 +31,7 @@ type Client struct {
 	purchaseService    *PurchaseService
 }
 
-// New creates a new goitunes client for the specified region
+// New creates a new goitunes client for the specified region.
 func New(region string, opts ...Option) (*Client, error) {
 	storeRegistry := config.NewStoreRegistry()
 
@@ -55,11 +55,12 @@ func New(region string, opts ...Option) (*Client, error) {
 
 	// Set default device if not provided
 	if client.device == nil {
-		client.device, _ = valueobject.NewDevice(
+		device, _ := valueobject.NewDevice(
 			"00000000-0000-0000-0000-000000000000",
 			"DefaultMachine",
 			valueobject.UserAgentWindows,
 		)
+		client.device = device
 	}
 
 	// Initialize repositories
@@ -101,48 +102,50 @@ func New(region string, opts ...Option) (*Client, error) {
 	return client, nil
 }
 
-// Charts returns the chart service
+// Charts returns the chart service.
 func (c *Client) Charts() *ChartService {
 	return c.chartService
 }
 
-// Applications returns the application service
+// Applications returns the application service.
 func (c *Client) Applications() *ApplicationService {
 	return c.applicationService
 }
 
-// Auth returns the authentication service
+// Auth returns the authentication service.
 func (c *Client) Auth() *AuthService {
 	if c.authService == nil {
 		panic("authentication not available: credentials not provided")
 	}
+
 	return c.authService
 }
 
-// Purchase returns the purchase service
+// Purchase returns the purchase service.
 func (c *Client) Purchase() *PurchaseService {
 	if c.purchaseService == nil {
 		panic("purchase not available: credentials not provided")
 	}
+
 	return c.purchaseService
 }
 
-// Region returns the current region
+// Region returns the current region.
 func (c *Client) Region() string {
 	return c.store.Region()
 }
 
-// SupportedRegions returns all supported regions
+// SupportedRegions returns all supported regions.
 func (c *Client) SupportedRegions() []string {
 	return c.storeRegistry.GetAllRegions()
 }
 
-// IsAuthenticated returns true if the client has valid credentials
+// IsAuthenticated returns true if the client has valid credentials.
 func (c *Client) IsAuthenticated() bool {
 	return c.credentials != nil && c.credentials.IsAuthenticated()
 }
 
-// CanPurchase returns true if the client can make purchases
+// CanPurchase returns true if the client can make purchases.
 func (c *Client) CanPurchase() bool {
 	return c.credentials != nil && c.credentials.CanPurchase()
 }

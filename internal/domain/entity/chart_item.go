@@ -1,13 +1,13 @@
 package entity
 
-// ChartItem represents an application in a chart position
+// ChartItem represents an application in a chart position.
 type ChartItem struct {
-	application *Application
 	position    int
+	application *Application
 	chartType   ChartType
 }
 
-// ChartType represents the type of chart
+// ChartType represents the type of chart.
 type ChartType string
 
 const (
@@ -16,7 +16,7 @@ const (
 	ChartTypeTopGrossing ChartType = "topgrossing"
 )
 
-// NewChartItem creates a new ChartItem
+// NewChartItem creates a new ChartItem.
 func NewChartItem(app *Application, position int, chartType ChartType) *ChartItem {
 	return &ChartItem{
 		application: app,
@@ -25,8 +25,7 @@ func NewChartItem(app *Application, position int, chartType ChartType) *ChartIte
 	}
 }
 
-// Getters
+// Getters.
 func (c *ChartItem) Application() *Application { return c.application }
 func (c *ChartItem) Position() int             { return c.position }
 func (c *ChartItem) ChartType() ChartType      { return c.chartType }
-
