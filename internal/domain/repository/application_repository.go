@@ -18,8 +18,8 @@ type ApplicationRepository interface {
 	GetFullInfo(ctx context.Context, adamID string) (*entity.Application, error)
 
 	// GetRating retrieves rating information for an application
-	GetRating(ctx context.Context, adamID string) (rating float64, count int, err error)
+	GetRating(ctx context.Context, adamID string) (*entity.Rating, error)
 
 	// GetOverallRating retrieves overall rating information
-	GetOverallRating(ctx context.Context, adamID string) (rating float64, count int, err error)
+	GetOverallRating(ctx context.Context, adamID string) (*entity.Rating, error)
 }

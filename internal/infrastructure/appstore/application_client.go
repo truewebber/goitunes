@@ -198,19 +198,19 @@ func (c *ApplicationClient) GetFullInfo(ctx context.Context, adamID string) (*en
 func (c *ApplicationClient) GetRating(
 	ctx context.Context,
 	adamID string,
-) (rating float64, count int, err error) {
+) (*entity.Rating, error) {
 	requestURL := fmt.Sprintf(config.NativeAppRatingInfoURL, adamID)
 
 	req, err := http.NewRequestWithContext(ctx, http.MethodGet, requestURL, http.NoBody)
 	if err != nil {
-		return 0, 0, fmt.Errorf("failed to create request: %w", err)
+		return nil, fmt.Errorf("failed to create request: %w", err)
 	}
 
 	req.Header.Add(config.HeaderXAppleStoreFront, c.store.XAppleStoreFrontWithDevice(config.IPhoneDeviceCode))
 
 	resp, err := c.httpClient.Do(req)
 	if err != nil {
-		return 0, 0, fmt.Errorf("failed to send request: %w", err)
+		return nil, fmt.Errorf("failed to send request: %w", err)
 	}
 
 	defer func() {
@@ -221,38 +221,41 @@ func (c *ApplicationClient) GetRating(
 	}()
 
 	if resp.StatusCode != http.StatusOK {
-		return 0, 0, fmt.Errorf("%w: %d", ErrUnexpectedStatusCode, resp.StatusCode)
+		return nil, fmt.Errorf("%w: %d", ErrUnexpectedStatusCode, resp.StatusCode)
 	}
 
 	data, err := io.ReadAll(resp.Body)
 	if err != nil {
-		return 0, 0, fmt.Errorf("failed to read response: %w", err)
+		return nil, fmt.Errorf("failed to read response: %w", err)
 	}
 
 	var response model.RatingResponse
 
 	if err = json.Unmarshal(data, &response); err != nil {
-		return 0, 0, fmt.Errorf("failed to unmarshal response: %w", err)
+		return nil, fmt.Errorf("failed to unmarshal response: %w", err)
 	}
 
-	return response.UserRating.Value, response.UserRating.RatingCount, nil
+	return &entity.Rating{
+		Value: response.UserRating.Value,
+		Count: response.UserRating.RatingCount,
+	}, nil
 }
 
 // GetOverallRating retrieves overall rating information.
 func (c *ApplicationClient) GetOverallRating(
 	ctx context.Context,
 	adamID string,
-) (rating float64, count int, err error) {
+) (*entity.Rating, error) {
 	requestURL := fmt.Sprintf(config.OpenAppOverAllRatingInfoURL, adamID, c.store.Region())
 
 	req, err := http.NewRequestWithContext(ctx, http.MethodGet, requestURL, http.NoBody)
 	if err != nil {
-		return 0, 0, fmt.Errorf("failed to create request: %w", err)
+		return nil, fmt.Errorf("failed to create request: %w", err)
 	}
 
 	resp, err := c.httpClient.Do(req)
 	if err != nil {
-		return 0, 0, fmt.Errorf("failed to send request: %w", err)
+		return nil, fmt.Errorf("failed to send request: %w", err)
 	}
 
 	defer func() {
@@ -263,27 +266,30 @@ func (c *ApplicationClient) GetOverallRating(
 	}()
 
 	if resp.StatusCode != http.StatusOK {
-		return 0, 0, fmt.Errorf("%w: %d", ErrUnexpectedStatusCode, resp.StatusCode)
+		return nil, fmt.Errorf("%w: %d", ErrUnexpectedStatusCode, resp.StatusCode)
 	}
 
 	data, err := io.ReadAll(resp.Body)
 	if err != nil {
-		return 0, 0, fmt.Errorf("failed to read response: %w", err)
+		return nil, fmt.Errorf("failed to read response: %w", err)
 	}
 
 	var response model.OverallRatingResponse
 
 	if err = json.Unmarshal(data, &response); err != nil {
-		return 0, 0, fmt.Errorf("failed to unmarshal response: %w", err)
+		return nil, fmt.Errorf("failed to unmarshal response: %w", err)
 	}
 
 	if len(response.Results) == 0 {
-		return 0, 0, fmt.Errorf("%w for adamID: %s", ErrNoRatingFound, adamID)
+		return nil, fmt.Errorf("%w for adamID: %s", ErrNoRatingFound, adamID)
 	}
 
 	result := response.Results[0]
 
-	return result.AverageUserRating, result.UserRatingCount, nil
+	return &entity.Rating{
+		Value: result.AverageUserRating,
+		Count: result.UserRatingCount,
+	}, nil
 }
 
 // mapToEntity maps API response to domain entity.

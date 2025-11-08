@@ -5,6 +5,7 @@ import (
 	"fmt"
 
 	"github.com/truewebber/goitunes/v2/internal/application/dto"
+	"github.com/truewebber/goitunes/v2/internal/domain/entity"
 	"github.com/truewebber/goitunes/v2/internal/domain/repository"
 )
 
@@ -22,16 +23,14 @@ func NewGetRating(appRepo repository.ApplicationRepository) *GetRating {
 
 // Execute retrieves rating information.
 func (uc *GetRating) Execute(ctx context.Context, req dto.GetRatingRequest) (*dto.GetRatingResponse, error) {
-	var rating float64
-
-	var count int
+	var rating *entity.Rating
 
 	var err error
 
 	if req.Overall {
-		rating, count, err = uc.appRepo.GetOverallRating(ctx, req.AdamID)
+		rating, err = uc.appRepo.GetOverallRating(ctx, req.AdamID)
 	} else {
-		rating, count, err = uc.appRepo.GetRating(ctx, req.AdamID)
+		rating, err = uc.appRepo.GetRating(ctx, req.AdamID)
 	}
 
 	if err != nil {
@@ -39,7 +38,7 @@ func (uc *GetRating) Execute(ctx context.Context, req dto.GetRatingRequest) (*dt
 	}
 
 	return &dto.GetRatingResponse{
-		Rating:      rating,
-		RatingCount: count,
+		Rating:      rating.Value,
+		RatingCount: rating.Count,
 	}, nil
 }
