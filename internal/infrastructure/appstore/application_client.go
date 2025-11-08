@@ -332,10 +332,6 @@ func (c *ApplicationClient) lookupApplications(
 		return nil, fmt.Errorf("failed to unmarshal response: %w", err)
 	}
 
-	if len(response.Results) == 0 {
-		return nil, ErrNoResultsFound
-	}
-
 	apps := make([]*entity.Application, 0, len(response.Results))
 
 	for key := range response.Results {

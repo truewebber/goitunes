@@ -57,7 +57,7 @@ func (c *ChartClient) GetTop200(
 		return nil, err
 	}
 
-	adamIDs, limit := c.extractAdamIDsAndLimit(response, limit)
+	adamIDs := c.extractAdamIDs(response)
 	fromToChunk := c.calculateChunkRange(from, limit, len(adamIDs))
 
 	topResults := response.StorePlatformData.Lockup.Results
@@ -197,19 +197,11 @@ func (c *ChartClient) fetchTop1500Response(
 	return response, nil
 }
 
-// extractAdamIDsAndLimit extracts Adam IDs and adjusts limit if needed.
-func (c *ChartClient) extractAdamIDsAndLimit(
-	response *model.Top200Response,
-	limit int,
-) ([]string, int) {
+// extractAdamIDsAndLimit extracts Adam IDs.
+func (c *ChartClient) extractAdamIDs(response *model.Top200Response) []string {
 	index := response.PageData.SegmentedControl.SelectedIndex
-	adamIDs := response.PageData.SegmentedControl.Segments[index].PageData.SelectedChart.AdamIDs
 
-	if limit <= 0 {
-		limit = response.Properties.DI6TopChartsPageNumIDsPerChart
-	}
-
-	return adamIDs, limit
+	return response.PageData.SegmentedControl.Segments[index].PageData.SelectedChart.AdamIDs
 }
 
 // calculateChunkRange calculates the range for processing.
@@ -338,11 +330,11 @@ func (c *ChartClient) buildAppFromTop1500Item(item *struct {
 	} `json:"buyData"`
 }) *entity.Application {
 	rating := c.parseRating(item.UserRating)
-	price, currency := c.parsePrice(item.BuyData.ActionParams, item.ButtonText)
+	pc := c.parsePriceCurrency(item.BuyData.ActionParams, item.ButtonText)
 	versionID := c.parseVersionID(item.BuyData.VersionID)
 
 	app := entity.NewApplication(item.ID, item.BuyData.BundleID, "")
-	app.SetPrice(price, currency)
+	app.SetPrice(pc.price, pc.currency)
 	app.SetRating(rating, 0)
 	app.SetVersion("", versionID)
 
@@ -359,25 +351,29 @@ func (c *ChartClient) parseRating(ratingStr string) float64 {
 	return rating
 }
 
+type priceCurrency struct {
+	currency string
+	price    float64
+}
+
 // parsePrice parses price and currency from buy params and button text.
-func (c *ChartClient) parsePrice(actionParams, buttonText string) (float64, string) {
+func (c *ChartClient) parsePriceCurrency(actionParams, buttonText string) priceCurrency {
 	buyParams, err := url.ParseQuery(actionParams)
 	if err != nil {
-		return 0, ""
+		return priceCurrency{}
 	}
 
 	paramPrice, err := strconv.ParseInt(buyParams.Get("price"), 10, 64)
 	if err != nil {
-		return 0, ""
+		return priceCurrency{}
 	}
-
-	currency := c.currencyService.ExtractCurrency(float64(paramPrice), buttonText)
 
 	const priceDivisor = 1000
 
-	price := float64(paramPrice) / priceDivisor
-
-	return price, currency
+	return priceCurrency{
+		price:    float64(paramPrice) / priceDivisor,
+		currency: c.currencyService.ExtractCurrency(float64(paramPrice), buttonText),
+	}
 }
 
 // parseVersionID parses version ID from string.
