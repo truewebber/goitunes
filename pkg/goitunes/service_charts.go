@@ -48,7 +48,7 @@ func (s *ChartService) GetTop200(
 		opt(&req)
 	}
 
-	resp, err := s.useCase.Execute(ctx, req)
+	resp, err := s.useCase.Execute(ctx, &req)
 	if err != nil {
 		return nil, fmt.Errorf("failed to get top 200 charts: %w", err)
 	}
@@ -70,7 +70,7 @@ func (s *ChartService) GetTop1500(
 		MaxResults: pageSize,
 	}
 
-	resp, err := s.useCase.Execute(ctx, req)
+	resp, err := s.useCase.Execute(ctx, &req)
 	if err != nil {
 		return nil, fmt.Errorf("failed to get top 1500 charts: %w", err)
 	}

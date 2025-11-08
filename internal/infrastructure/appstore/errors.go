@@ -7,7 +7,9 @@ var (
 	ErrCredentialsDoNotSupportPurchasing = errors.New("credentials do not support purchasing")
 
 	// ErrApplicationRequiresRedownload is returned when application requires re-download.
-	ErrApplicationRequiresRedownload = errors.New("application requires re-download (STDRDL), which requires different kbsync certificate")
+	ErrApplicationRequiresRedownload = errors.New(
+		"application requires re-download (STDRDL), which requires different kbsync certificate",
+	)
 
 	// ErrDownloadURLNotFound is returned when download URL is not found in response.
 	ErrDownloadURLNotFound = errors.New("download URL not found in response")

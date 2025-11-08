@@ -26,7 +26,6 @@ type Application struct {
 	versionID        int64
 }
 
-// NewApplication creates a new Application entity.
 func NewApplication(adamID, bundleID, name string) *Application {
 	return &Application{
 		adamID:         adamID,
@@ -37,7 +36,6 @@ func NewApplication(adamID, bundleID, name string) *Application {
 	}
 }
 
-// Getters.
 func (a *Application) AdamID() string           { return a.adamID }
 func (a *Application) BundleID() string         { return a.bundleID }
 func (a *Application) Name() string             { return a.name }
@@ -59,7 +57,6 @@ func (a *Application) Description() string      { return a.description }
 func (a *Application) IconURL() string          { return a.iconURL }
 func (a *Application) ScreenshotURLs() []string { return a.screenshotURLs }
 
-// Setters (for builder pattern).
 func (a *Application) SetArtistName(name string) *Application {
 	a.artistName = name
 
@@ -142,12 +139,10 @@ func (a *Application) SetScreenshotURLs(urls []string) *Application {
 	return a
 }
 
-// IsFree returns true if the application is free.
 func (a *Application) IsFree() bool {
 	return a.price == 0
 }
 
-// IsUniversal returns true if the application supports both iPhone and iPad.
 func (a *Application) IsUniversal() bool {
 	hasIPhone := false
 	hasIPad := false

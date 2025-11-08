@@ -13,19 +13,19 @@ func TestCurrencyService_ExtractCurrency(t *testing.T) {
 
 	tests := []struct {
 		name           string
-		price          float64
 		formattedPrice string
 		expected       string
+		price          float64
 	}{
-		{"Free app", 0, "Free", ""},
-		{"USD with dollar sign", 9.99, "$9.99", "$"},
-		{"EUR with euro sign", 8.99, "€8,99", "€"},
-		{"GBP with pound sign", 7.99, "£7.99", "£"},
-		{"RUB with ruble sign", 599.00, "599,00 ₽", "₽"},
-		{"JPY with yen sign", 1200, "¥1,200", "¥"},
-		{"Get button", 0, "Get", ""},
-		{"Download", 0, "Download", ""},
-		{"Complex format", 12.99, "US$ 12.99", "US$"},
+		{name: "Free app", price: 0, formattedPrice: "Free", expected: ""},
+		{name: "USD with dollar sign", price: 9.99, formattedPrice: "$9.99", expected: "$"},
+		{name: "EUR with euro sign", price: 8.99, formattedPrice: "€8,99", expected: "€"},
+		{name: "GBP with pound sign", price: 7.99, formattedPrice: "£7.99", expected: "£"},
+		{name: "RUB with ruble sign", price: 599.00, formattedPrice: "599,00 ₽", expected: "₽"},
+		{name: "JPY with yen sign", price: 1200, formattedPrice: "¥1,200", expected: "¥"},
+		{name: "Get button", price: 0, formattedPrice: "Get", expected: ""},
+		{name: "Download", price: 0, formattedPrice: "Download", expected: ""},
+		{name: "Complex format", price: 12.99, formattedPrice: "US$ 12.99", expected: "US$"},
 	}
 
 	for _, tt := range tests {
@@ -47,14 +47,14 @@ func TestCurrencyService_FormatPrice(t *testing.T) {
 
 	tests := []struct {
 		name     string
-		price    float64
 		currency string
 		expected string
+		price    float64
 	}{
-		{"Free", 0, "", "Free"},
-		{"Free with currency", 0, "$", "Free"},
-		{"Paid with currency", 9.99, "$", "$"},
-		{"No currency", 9.99, "", "0"},
+		{name: "Free", price: 0, currency: "", expected: "Free"},
+		{name: "Free with currency", price: 0, currency: "$", expected: "Free"},
+		{name: "Paid with currency", price: 9.99, currency: "$", expected: "$"},
+		{name: "No currency", price: 9.99, currency: "", expected: "0"},
 	}
 
 	for _, tt := range tests {

@@ -33,17 +33,18 @@ func (uc *GetApplicationInfo) Execute(
 
 	var err error
 
-	if len(req.AdamIDs) > 0 {
+	switch {
+	case len(req.AdamIDs) > 0:
 		apps, err = uc.appRepo.FindByAdamID(ctx, req.AdamIDs)
 		if err != nil {
 			return nil, fmt.Errorf("failed to find apps by adamID: %w", err)
 		}
-	} else if len(req.BundleIDs) > 0 {
+	case len(req.BundleIDs) > 0:
 		apps, err = uc.appRepo.FindByBundleID(ctx, req.BundleIDs)
 		if err != nil {
 			return nil, fmt.Errorf("failed to find apps by bundleID: %w", err)
 		}
-	} else {
+	default:
 		return nil, ErrMissingIdentifiers
 	}
 

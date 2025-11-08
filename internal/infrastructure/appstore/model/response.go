@@ -2,25 +2,25 @@ package model
 
 // Top200Response represents the response from Top200 API.
 type Top200Response struct {
-	PageData struct {
-		SegmentedControl struct {
-			SelectedIndex int `json:"selectedIndex"`
-			Segments      []struct {
-				PageData struct {
-					SelectedChart struct {
-						AdamIds []string `json:"adamIds"`
-					} `json:"selectedChart"`
-				} `json:"pageData"`
-			} `json:"segments"`
-		} `json:"segmentedControl"`
-	} `json:"pageData"`
 	StorePlatformData struct {
 		Lockup struct {
 			Results map[string]AppItemResponse `json:"results"`
 		} `json:"lockup"`
 	} `json:"storePlatformData"`
+	PageData struct {
+		SegmentedControl struct {
+			Segments []struct {
+				PageData struct {
+					SelectedChart struct {
+						AdamIDs []string `json:"adamIds"`
+					} `json:"selectedChart"`
+				} `json:"pageData"`
+			} `json:"segments"`
+			SelectedIndex int `json:"selectedIndex"`
+		} `json:"segmentedControl"`
+	} `json:"pageData"`
 	Properties struct {
-		DI6TopChartsPageNumIdsPerChart int `json:"di6-top-charts-page-num-ids-per-chart"`
+		DI6TopChartsPageNumIDsPerChart int `json:"di6-top-charts-page-num-ids-per-chart"`
 	} `json:"properties"`
 }
 
@@ -40,22 +40,34 @@ type Top1500Response struct {
 
 // AppItemResponse represents application information.
 type AppItemResponse struct {
-	ID         string `json:"id"`
-	BundleID   string `json:"bundleId"`
-	Name       string `json:"name"`
-	NameRaw    string `json:"nameRaw"`
-	ArtistName string `json:"artistName"`
-	ArtistID   string `json:"artistId"`
-	ArtistURL  string `json:"artistUrl"`
-	UserRating struct {
-		Value       float64 `json:"value"`
-		RatingCount int     `json:"ratingCount"`
-	} `json:"userRating"`
-	Offers []struct {
-		Type           string  `json:"type"`
-		Price          float64 `json:"price"`
-		PriceFormatted string  `json:"priceFormatted"`
-		BuyParams      string  `json:"buyParams"`
+	ScreenshotsByType map[string][]struct {
+		URL string `json:"url"`
+	} `json:"screenshotsByType"`
+	FileSizeByDevice map[string]int `json:"fileSizeByDevice"`
+	MinimumOSVersion string         `json:"minimumOSVersion"`
+	Description      struct {
+		Standard string `json:"standard"`
+	} `json:"description"`
+	ArtistName  string `json:"artistName"`
+	ArtistID    string `json:"artistId"`
+	ArtistURL   string `json:"artistUrl"`
+	BundleID    string `json:"bundleId"`
+	ReleaseDate string `json:"releaseDate"`
+	ID          string `json:"id"`
+	Name        string `json:"name"`
+	NameRaw     string `json:"nameRaw"`
+	Genres      []struct {
+		GenreID   string `json:"genreId"`
+		Name      string `json:"name"`
+		URL       string `json:"url"`
+		MediaType string `json:"mediaType"`
+	} `json:"genres"`
+	GenreNames     []string `json:"genreNames"`
+	DeviceFamilies []string `json:"deviceFamilies"`
+	Offers         []struct {
+		Type           string `json:"type"`
+		PriceFormatted string `json:"priceFormatted"`
+		BuyParams      string `json:"buyParams"`
 		Version        struct {
 			Display    string `json:"display"`
 			ExternalID int    `json:"externalId"`
@@ -64,29 +76,17 @@ type AppItemResponse struct {
 			Flavor string `json:"flavor"`
 			Size   int    `json:"size"`
 		} `json:"assets"`
+		Price float64 `json:"price"`
 	} `json:"offers"`
-	DeviceFamilies []string `json:"deviceFamilies"`
-	GenreNames     []string `json:"genreNames"`
-	Genres         []struct {
-		GenreID   string `json:"genreId"`
-		Name      string `json:"name"`
-		URL       string `json:"url"`
-		MediaType string `json:"mediaType"`
-	} `json:"genres"`
-	ReleaseDate string `json:"releaseDate"`
-	Artwork     struct {
-		Width  int    `json:"width"`
+	Artwork struct {
 		URL    string `json:"url"`
+		Width  int    `json:"width"`
 		Height int    `json:"height"`
 	} `json:"artwork"`
-	ScreenshotsByType map[string][]struct {
-		URL string `json:"url"`
-	} `json:"screenshotsByType"`
-	Description struct {
-		Standard string `json:"standard"`
-	} `json:"description"`
-	MinimumOSVersion string         `json:"minimumOSVersion"`
-	FileSizeByDevice map[string]int `json:"fileSizeByDevice"`
+	UserRating struct {
+		Value       float64 `json:"value"`
+		RatingCount int     `json:"ratingCount"`
+	} `json:"userRating"`
 }
 
 // LookupResponse represents the response from lookup API.

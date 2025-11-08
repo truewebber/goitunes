@@ -81,7 +81,7 @@ func (c *AuthClient) Authenticate(
 
 	var authResp model.AuthResponse
 
-	if err := plist.Unmarshal(data, &authResp); err != nil {
+	if err = plist.Unmarshal(data, &authResp); err != nil {
 		return nil, fmt.Errorf("failed to unmarshal response: %w", err)
 	}
 

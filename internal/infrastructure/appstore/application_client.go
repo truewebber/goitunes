@@ -74,7 +74,7 @@ func (c *ApplicationClient) FindByAdamID(ctx context.Context, adamIDs []string) 
 
 	var response model.LookupResponse
 
-	if err := json.Unmarshal(data, &response); err != nil {
+	if err = json.Unmarshal(data, &response); err != nil {
 		return nil, fmt.Errorf("failed to unmarshal response: %w", err)
 	}
 
@@ -82,10 +82,10 @@ func (c *ApplicationClient) FindByAdamID(ctx context.Context, adamIDs []string) 
 		return nil, fmt.Errorf("%w for adamIds: %s", ErrNoResultsFound, strings.Join(adamIDs, ","))
 	}
 
-	var apps []*entity.Application
+	apps := make([]*entity.Application, 0, len(response.Results))
 
-	for _, item := range response.Results {
-		app := c.mapToEntity(item)
+	for i := range response.Results {
+		app := c.mapToEntity(response.Results[i])
 		apps = append(apps, app)
 	}
 
@@ -132,7 +132,7 @@ func (c *ApplicationClient) FindByBundleID(ctx context.Context, bundleIDs []stri
 
 	var response model.LookupResponse
 
-	if err := json.Unmarshal(data, &response); err != nil {
+	if err = json.Unmarshal(data, &response); err != nil {
 		return nil, fmt.Errorf("failed to unmarshal response: %w", err)
 	}
 
@@ -140,10 +140,10 @@ func (c *ApplicationClient) FindByBundleID(ctx context.Context, bundleIDs []stri
 		return nil, fmt.Errorf("%w for bundleIds: %s", ErrNoResultsFound, strings.Join(bundleIDs, ","))
 	}
 
-	var apps []*entity.Application
+	apps := make([]*entity.Application, 0, len(response.Results))
 
-	for _, item := range response.Results {
-		app := c.mapToEntity(item)
+	for i := range response.Results {
+		app := c.mapToEntity(response.Results[i])
 		apps = append(apps, app)
 	}
 
@@ -182,7 +182,7 @@ func (c *ApplicationClient) GetFullInfo(ctx context.Context, adamID string) (*en
 
 	var response model.FullAppResponse
 
-	if err := json.Unmarshal(data, &response); err != nil {
+	if err = json.Unmarshal(data, &response); err != nil {
 		return nil, fmt.Errorf("failed to unmarshal response: %w", err)
 	}
 
@@ -195,8 +195,13 @@ func (c *ApplicationClient) GetFullInfo(ctx context.Context, adamID string) (*en
 }
 
 // GetRating retrieves rating information for an application.
-func (c *ApplicationClient) GetRating(ctx context.Context, adamID string) (float64, int, error) {
-	req, err := http.NewRequestWithContext(ctx, http.MethodGet, fmt.Sprintf(config.NativeAppRatingInfoURL, adamID), http.NoBody)
+func (c *ApplicationClient) GetRating(
+	ctx context.Context,
+	adamID string,
+) (rating float64, count int, err error) {
+	requestURL := fmt.Sprintf(config.NativeAppRatingInfoURL, adamID)
+
+	req, err := http.NewRequestWithContext(ctx, http.MethodGet, requestURL, http.NoBody)
 	if err != nil {
 		return 0, 0, fmt.Errorf("failed to create request: %w", err)
 	}
@@ -226,7 +231,7 @@ func (c *ApplicationClient) GetRating(ctx context.Context, adamID string) (float
 
 	var response model.RatingResponse
 
-	if err := json.Unmarshal(data, &response); err != nil {
+	if err = json.Unmarshal(data, &response); err != nil {
 		return 0, 0, fmt.Errorf("failed to unmarshal response: %w", err)
 	}
 
@@ -234,8 +239,13 @@ func (c *ApplicationClient) GetRating(ctx context.Context, adamID string) (float
 }
 
 // GetOverallRating retrieves overall rating information.
-func (c *ApplicationClient) GetOverallRating(ctx context.Context, adamID string) (float64, int, error) {
-	req, err := http.NewRequestWithContext(ctx, http.MethodGet, fmt.Sprintf(config.OpenAppOverAllRatingInfoURL, adamID, c.store.Region()), http.NoBody)
+func (c *ApplicationClient) GetOverallRating(
+	ctx context.Context,
+	adamID string,
+) (rating float64, count int, err error) {
+	requestURL := fmt.Sprintf(config.OpenAppOverAllRatingInfoURL, adamID, c.store.Region())
+
+	req, err := http.NewRequestWithContext(ctx, http.MethodGet, requestURL, http.NoBody)
 	if err != nil {
 		return 0, 0, fmt.Errorf("failed to create request: %w", err)
 	}
@@ -263,7 +273,7 @@ func (c *ApplicationClient) GetOverallRating(ctx context.Context, adamID string)
 
 	var response model.OverallRatingResponse
 
-	if err := json.Unmarshal(data, &response); err != nil {
+	if err = json.Unmarshal(data, &response); err != nil {
 		return 0, 0, fmt.Errorf("failed to unmarshal response: %w", err)
 	}
 

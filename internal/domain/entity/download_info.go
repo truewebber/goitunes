@@ -13,7 +13,6 @@ type DownloadInfo struct {
 	fileSize    int64
 }
 
-// NewDownloadInfo creates a new DownloadInfo entity.
 func NewDownloadInfo(bundleID, url, downloadKey string) *DownloadInfo {
 	return &DownloadInfo{
 		bundleID:    bundleID,
@@ -23,7 +22,6 @@ func NewDownloadInfo(bundleID, url, downloadKey string) *DownloadInfo {
 	}
 }
 
-// Getters.
 func (d *DownloadInfo) BundleID() string           { return d.bundleID }
 func (d *DownloadInfo) URL() string                { return d.url }
 func (d *DownloadInfo) DownloadKey() string        { return d.downloadKey }
@@ -34,7 +32,6 @@ func (d *DownloadInfo) DownloadID() string         { return d.downloadID }
 func (d *DownloadInfo) VersionID() int64           { return d.versionID }
 func (d *DownloadInfo) FileSize() int64            { return d.fileSize }
 
-// Setters.
 func (d *DownloadInfo) SetSinf(sinf string) *DownloadInfo {
 	d.sinf = sinf
 

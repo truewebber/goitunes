@@ -55,13 +55,13 @@ func New(region string, opts ...Option) (*Client, error) {
 
 	// Set default device if not provided
 	if client.device == nil {
-		device, err := valueobject.NewDevice(
+		device, deviceErr := valueobject.NewDevice(
 			"00000000-0000-0000-0000-000000000000",
 			"DefaultMachine",
 			valueobject.UserAgentWindows,
 		)
-		if err != nil {
-			return nil, fmt.Errorf("failed to create default device: %w", err)
+		if deviceErr != nil {
+			return nil, fmt.Errorf("failed to create default device: %w", deviceErr)
 		}
 
 		client.device = device

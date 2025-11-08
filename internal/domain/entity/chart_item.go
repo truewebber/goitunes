@@ -16,7 +16,6 @@ const (
 	ChartTypeTopGrossing ChartType = "topgrossing"
 )
 
-// NewChartItem creates a new ChartItem.
 func NewChartItem(app *Application, position int, chartType ChartType) *ChartItem {
 	return &ChartItem{
 		application: app,
@@ -25,7 +24,6 @@ func NewChartItem(app *Application, position int, chartType ChartType) *ChartIte
 	}
 }
 
-// Getters.
 func (c *ChartItem) Application() *Application { return c.application }
 func (c *ChartItem) Position() int             { return c.position }
 func (c *ChartItem) ChartType() ChartType      { return c.chartType }

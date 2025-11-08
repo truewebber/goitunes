@@ -49,9 +49,10 @@ func (d *Device) Equals(other *Device) bool {
 }
 
 // DefaultUserAgents contains commonly used user agents.
-var (
+const (
 	UserAgentTop200   = "AppStore/2.0 iOS/9.0 model/iPhone6,1 hwp/s5l8960x build/13A344 (6; dt:89)"
 	UserAgentTop1500  = "iTunes-iPad/5.1.1 (64GB; dt:28)"
 	UserAgentDownload = "itunesstored/1.0 iOS/9.0 model/iPhone6,1 hwp/s5l8960x build/13A344 (6; dt:89)"
-	UserAgentWindows  = "iTunes/10.6 (Windows; Microsoft Windows 7 x64 Ultimate Edition Service Pack 1 (Build 7601)) AppleWebKit/534.54.16"
+	UserAgentWindows  = "iTunes/10.6 (Windows; Microsoft Windows 7 x64 Ultimate Edition " +
+		"Service Pack 1 (Build 7601)) AppleWebKit/534.54.16"
 )
