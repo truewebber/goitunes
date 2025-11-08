@@ -2,7 +2,6 @@ package main
 
 import (
 	"context"
-	"fmt"
 	"log"
 	"os"
 
@@ -24,6 +23,7 @@ func main() {
 	if guid == "" {
 		guid = "00000000-0000-0000-0000-000000000000"
 	}
+
 	if machineName == "" {
 		machineName = "MyMachine"
 	}
@@ -40,29 +40,30 @@ func main() {
 	ctx := context.Background()
 
 	// Check authentication status before login
-	fmt.Printf("Authenticated before login: %t\n", client.IsAuthenticated())
+	log.Printf("Authenticated before login: %t", client.IsAuthenticated())
 
 	// Perform login
-	fmt.Println("\n=== Logging in ===")
+	log.Println("\n=== Logging in ===")
+
 	authResp, err := client.Auth().Login(ctx, password)
 	if err != nil {
 		log.Fatalf("Login failed: %v", err)
 	}
 
-	fmt.Printf("Login successful!\n")
-	fmt.Printf("Apple ID: %s\n", authResp.AppleID)
-	fmt.Printf("DSID: %s\n", authResp.DSID)
-	fmt.Printf("Password Token: %s...\n", authResp.PasswordToken[:20])
-	fmt.Printf("Authenticated: %t\n", authResp.Authenticated)
+	log.Println("Login successful!")
+	log.Printf("Apple ID: %s", authResp.AppleID)
+	log.Printf("DSID: %s", authResp.DSID)
+	log.Printf("Password Token: %s...", authResp.PasswordToken[:20])
+	log.Printf("Authenticated: %t", authResp.Authenticated)
 
 	// Check authentication status after login
-	fmt.Printf("\nAuthenticated after login: %t\n", client.IsAuthenticated())
-	fmt.Printf("Can purchase: %t\n", client.CanPurchase())
+	log.Printf("\nAuthenticated after login: %t", client.IsAuthenticated())
+	log.Printf("Can purchase: %t", client.CanPurchase())
 
 	// Now you can use authenticated endpoints
 	// For example, you can now purchase applications if you have kbsync set up
 
-	fmt.Println("\n=== Client Info ===")
-	fmt.Printf("Region: %s\n", client.Region())
-	fmt.Printf("Supported regions: %v\n", client.SupportedRegions())
+	log.Println("\n=== Client Info ===")
+	log.Printf("Region: %s", client.Region())
+	log.Printf("Supported regions: %v", client.SupportedRegions())
 }

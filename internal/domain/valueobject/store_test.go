@@ -1,8 +1,14 @@
-package valueobject
+package valueobject_test
 
-import "testing"
+import (
+	"testing"
+
+	"github.com/truewebber/goitunes/v2/internal/domain/valueobject"
+)
 
 func TestNewStore(t *testing.T) {
+	t.Parallel()
+
 	tests := []struct {
 		name        string
 		region      string
@@ -19,27 +25,35 @@ func TestNewStore(t *testing.T) {
 	}
 
 	for _, tt := range tests {
+		tt := tt
+
 		t.Run(tt.name, func(t *testing.T) {
-			store, err := NewStore(tt.region, tt.storeFront, tt.hostPrefix)
+			t.Parallel()
+
+			store, err := valueobject.NewStore(tt.region, tt.storeFront, tt.hostPrefix)
 
 			if tt.expectError {
 				if err == nil {
 					t.Error("Expected error but got none")
 				}
+
 				return
 			}
 
 			if err != nil {
 				t.Errorf("Unexpected error: %v", err)
+
 				return
 			}
 
 			if store.Region() != tt.region {
 				t.Errorf("Expected region %s, got %s", tt.region, store.Region())
 			}
+
 			if store.StoreFront() != tt.storeFront {
 				t.Errorf("Expected storeFront %d, got %d", tt.storeFront, store.StoreFront())
 			}
+
 			if store.HostPrefix() != tt.hostPrefix {
 				t.Errorf("Expected hostPrefix %d, got %d", tt.hostPrefix, store.HostPrefix())
 			}
@@ -48,7 +62,13 @@ func TestNewStore(t *testing.T) {
 }
 
 func TestStore_XAppleStoreFront(t *testing.T) {
-	store, _ := NewStore("us", 143441, 36)
+	t.Parallel()
+
+	store, err := valueobject.NewStore("us", 143441, 36)
+	if err != nil {
+		t.Fatalf("Failed to create store: %v", err)
+	}
+
 	expected := "143441,32"
 
 	if store.XAppleStoreFront() != expected {
@@ -57,7 +77,13 @@ func TestStore_XAppleStoreFront(t *testing.T) {
 }
 
 func TestStore_XAppleStoreFrontWithDevice(t *testing.T) {
-	store, _ := NewStore("us", 143441, 36)
+	t.Parallel()
+
+	store, err := valueobject.NewStore("us", 143441, 36)
+	if err != nil {
+		t.Fatalf("Failed to create store: %v", err)
+	}
+
 	deviceCode := 29
 	expected := "143441,29"
 
@@ -68,9 +94,22 @@ func TestStore_XAppleStoreFrontWithDevice(t *testing.T) {
 }
 
 func TestStore_Equals(t *testing.T) {
-	store1, _ := NewStore("us", 143441, 36)
-	store2, _ := NewStore("us", 143441, 36)
-	store3, _ := NewStore("ru", 143469, 45)
+	t.Parallel()
+
+	store1, err := valueobject.NewStore("us", 143441, 36)
+	if err != nil {
+		t.Fatalf("Failed to create store1: %v", err)
+	}
+
+	store2, err := valueobject.NewStore("us", 143441, 36)
+	if err != nil {
+		t.Fatalf("Failed to create store2: %v", err)
+	}
+
+	store3, err := valueobject.NewStore("ru", 143469, 45)
+	if err != nil {
+		t.Fatalf("Failed to create store3: %v", err)
+	}
 
 	if !store1.Equals(store2) {
 		t.Error("Same stores should be equal")

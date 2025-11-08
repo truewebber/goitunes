@@ -8,13 +8,17 @@ import (
 	"github.com/truewebber/goitunes/v2/pkg/goitunes"
 )
 
+const (
+	topAppsLimit = 3
+)
+
 func main() {
 	ctx := context.Background()
 
 	// Define regions to query
 	regions := []string{"us", "ru", "gb", "jp", "de"}
 
-	fmt.Println("=== Comparing App Prices Across Regions ===")
+	log.Println("=== Comparing App Prices Across Regions ===")
 
 	bundleID := "com.facebook.Facebook"
 
@@ -23,6 +27,7 @@ func main() {
 		client, err := goitunes.New(region)
 		if err != nil {
 			log.Printf("Failed to create client for %s: %v", region, err)
+
 			continue
 		}
 
@@ -30,21 +35,24 @@ func main() {
 		apps, err := client.Applications().GetByBundleID(ctx, bundleID)
 		if err != nil {
 			log.Printf("Failed to get app for %s: %v", region, err)
+
 			continue
 		}
 
 		if len(apps) == 0 {
-			fmt.Printf("%s: App not available\n", region)
+			log.Printf("%s: App not available", region)
+
 			continue
 		}
 
 		app := apps[0]
+
 		price := "Free"
 		if !app.IsFree {
 			price = fmt.Sprintf("%.2f %s", app.Price, app.Currency)
 		}
 
-		fmt.Printf("%s: %s - %s (Rating: %.1f)\n",
+		log.Printf("%s: %s - %s (Rating: %.1f)",
 			region,
 			app.Name,
 			price,
@@ -52,7 +60,7 @@ func main() {
 		)
 	}
 
-	fmt.Println("\n=== Top Apps in Different Regions ===")
+	log.Println("\n=== Top Apps in Different Regions ===")
 
 	regionsTop := []string{"us", "jp", "br"}
 
@@ -60,6 +68,7 @@ func main() {
 		client, err := goitunes.New(region)
 		if err != nil {
 			log.Printf("Failed to create client for %s: %v", region, err)
+
 			continue
 		}
 
@@ -67,33 +76,40 @@ func main() {
 			ctx,
 			goitunes.GenreAll,
 			goitunes.ChartTypeTopFree,
-			goitunes.WithRange(1, 3),
+			goitunes.WithRange(1, topAppsLimit),
 		)
 		if err != nil {
 			log.Printf("Failed to get charts for %s: %v", region, err)
+
 			continue
 		}
 
-		fmt.Printf("Top 3 Free Apps in %s:\n", region)
-		for _, item := range charts {
-			fmt.Printf("  %d. %s\n", item.Position, item.App.Name)
+		log.Printf("Top 3 Free Apps in %s:", region)
+
+		for i := range charts {
+			log.Printf("  %d. %s", charts[i].Position, charts[i].App.Name)
 		}
-		fmt.Println()
+
+		log.Println()
 	}
 
-	fmt.Println("=== Supported Regions ===")
+	log.Println("=== Supported Regions ===")
 
 	// Get list of all supported regions
-	client, _ := goitunes.New("us")
+	client, err := goitunes.New("us")
+	if err != nil {
+		log.Fatalf("Failed to create client: %v", err)
+	}
+
 	regions = client.SupportedRegions()
 
-	fmt.Printf("Total supported regions: %d\n", len(regions))
-	fmt.Printf("Regions: %v\n", regions)
+	log.Printf("Total supported regions: %d", len(regions))
+	log.Printf("Regions: %v", regions)
 
-	fmt.Println("\n=== Regional Differences ===")
-	fmt.Println("✓ Pricing varies by region")
-	fmt.Println("✓ Chart rankings differ")
-	fmt.Println("✓ App availability varies")
-	fmt.Println("✓ Currency and localization")
-	fmt.Println("✓ Rating counts can differ")
+	log.Println("\n=== Regional Differences ===")
+	log.Println("✓ Pricing varies by region")
+	log.Println("✓ Chart rankings differ")
+	log.Println("✓ App availability varies")
+	log.Println("✓ Currency and localization")
+	log.Println("✓ Rating counts can differ")
 }

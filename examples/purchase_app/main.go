@@ -2,11 +2,14 @@ package main
 
 import (
 	"context"
-	"fmt"
 	"log"
 	"os"
 
 	"github.com/truewebber/goitunes/v2/pkg/goitunes"
+)
+
+const (
+	bytesPerMB = 1024 * 1024
 )
 
 func main() {
@@ -24,6 +27,7 @@ func main() {
 	if guid == "" {
 		guid = "00000000-0000-0000-0000-000000000000"
 	}
+
 	if machineName == "" {
 		machineName = "MyMachine"
 	}
@@ -41,12 +45,14 @@ func main() {
 	ctx := context.Background()
 
 	// Perform login
-	fmt.Println("=== Logging in ===")
+	log.Println("=== Logging in ===")
+
 	authResp, err := client.Auth().Login(ctx, password)
 	if err != nil {
 		log.Fatalf("Login failed: %v", err)
 	}
-	fmt.Printf("Login successful! DSID: %s\n", authResp.DSID)
+
+	log.Printf("Login successful! DSID: %s", authResp.DSID)
 
 	// Check if we can purchase
 	if !client.CanPurchase() {
@@ -55,7 +61,7 @@ func main() {
 
 	// Get application info first
 	bundleID := "com.example.app" // Replace with actual bundle ID
-	fmt.Printf("\n=== Getting application info for %s ===\n", bundleID)
+	log.Printf("\n=== Getting application info for %s ===", bundleID)
 
 	apps, err := client.Applications().GetByBundleID(ctx, bundleID)
 	if err != nil {
@@ -67,40 +73,42 @@ func main() {
 	}
 
 	app := apps[0]
-	fmt.Printf("Name: %s\n", app.Name)
-	fmt.Printf("Adam ID: %s\n", app.AdamID)
-	fmt.Printf("Version: %s (ID: %d)\n", app.Version, app.VersionID)
-	fmt.Printf("Price: $%.2f\n", app.Price)
+	log.Printf("Name: %s", app.Name)
+	log.Printf("Adam ID: %s", app.AdamID)
+	log.Printf("Version: %s (ID: %d)", app.Version, app.VersionID)
+	log.Printf("Price: $%.2f", app.Price)
 
 	// Purchase the application
-	fmt.Println("\n=== Purchasing application ===")
+	log.Println("\n=== Purchasing application ===")
+
 	downloadInfo, err := client.Purchase().Buy(ctx, app.AdamID, app.VersionID)
 	if err != nil {
 		log.Fatalf("Purchase failed: %v", err)
 	}
 
-	fmt.Println("Purchase successful!")
-	fmt.Printf("Bundle ID: %s\n", downloadInfo.BundleID)
-	fmt.Printf("Download URL: %s\n", downloadInfo.URL)
-	fmt.Printf("Download Key: %s\n", downloadInfo.DownloadKey)
-	fmt.Printf("Download ID: %s\n", downloadInfo.DownloadID)
-	fmt.Printf("Version ID: %d\n", downloadInfo.VersionID)
-	fmt.Printf("File Size: %.2f MB\n", float64(downloadInfo.FileSize)/(1024*1024))
+	log.Println("Purchase successful!")
+	log.Printf("Bundle ID: %s", downloadInfo.BundleID)
+	log.Printf("Download URL: %s", downloadInfo.URL)
+	log.Printf("Download Key: %s", downloadInfo.DownloadKey)
+	log.Printf("Download ID: %s", downloadInfo.DownloadID)
+	log.Printf("Version ID: %d", downloadInfo.VersionID)
+	log.Printf("File Size: %.2f MB", float64(downloadInfo.FileSize)/bytesPerMB)
 
 	// Display download headers
-	fmt.Println("\nDownload Headers:")
+	log.Println("\nDownload Headers:")
+
 	for key, value := range downloadInfo.Headers {
-		fmt.Printf("  %s: %s\n", key, value)
+		log.Printf("  %s: %s", key, value)
 	}
 
 	// SINF and Metadata are base64 encoded
-	fmt.Printf("\nSINF (base64): %s...\n", downloadInfo.Sinf[:50])
-	fmt.Printf("Metadata (base64): %s...\n", downloadInfo.Metadata[:50])
+	log.Printf("\nSINF (base64): %s...", downloadInfo.Sinf[:50])
+	log.Printf("Metadata (base64): %s...", downloadInfo.Metadata[:50])
 
-	fmt.Println("\n=== Download Instructions ===")
-	fmt.Println("1. Use the download URL with provided headers")
-	fmt.Println("2. Save the IPA file")
-	fmt.Println("3. Inject SINF into the IPA (SC_Info/Sinf.sinf)")
-	fmt.Println("4. Inject Metadata into the IPA (iTunesMetadata.plist)")
-	fmt.Println("5. The application can now be installed")
+	log.Println("\n=== Download Instructions ===")
+	log.Println("1. Use the download URL with provided headers")
+	log.Println("2. Save the IPA file")
+	log.Println("3. Inject SINF into the IPA (SC_Info/Sinf.sinf)")
+	log.Println("4. Inject Metadata into the IPA (iTunesMetadata.plist)")
+	log.Println("5. The application can now be installed")
 }

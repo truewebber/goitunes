@@ -1,11 +1,17 @@
-package valueobject
+package valueobject_test
 
-import "testing"
+import (
+	"testing"
+
+	"github.com/truewebber/goitunes/v2/internal/domain/valueobject"
+)
 
 func TestNewCredentials(t *testing.T) {
+	t.Parallel()
+
 	appleID := "test@example.com"
 
-	creds, err := NewCredentials(appleID)
+	creds, err := valueobject.NewCredentials(appleID)
 	if err != nil {
 		t.Fatalf("Unexpected error: %v", err)
 	}
@@ -20,18 +26,22 @@ func TestNewCredentials(t *testing.T) {
 }
 
 func TestNewCredentials_EmptyAppleID(t *testing.T) {
-	_, err := NewCredentials("")
+	t.Parallel()
+
+	_, err := valueobject.NewCredentials("")
 	if err == nil {
 		t.Error("Expected error for empty appleID")
 	}
 }
 
 func TestNewCredentialsWithTokens(t *testing.T) {
+	t.Parallel()
+
 	appleID := "test@example.com"
 	token := "test_token"
 	dsid := "123456"
 
-	creds, err := NewCredentialsWithTokens(appleID, token, dsid)
+	creds, err := valueobject.NewCredentialsWithTokens(appleID, token, dsid)
 	if err != nil {
 		t.Fatalf("Unexpected error: %v", err)
 	}
@@ -39,9 +49,11 @@ func TestNewCredentialsWithTokens(t *testing.T) {
 	if creds.AppleID() != appleID {
 		t.Errorf("Expected appleID %s, got %s", appleID, creds.AppleID())
 	}
+
 	if creds.PasswordToken() != token {
 		t.Errorf("Expected token %s, got %s", token, creds.PasswordToken())
 	}
+
 	if creds.DSID() != dsid {
 		t.Errorf("Expected DSID %s, got %s", dsid, creds.DSID())
 	}
@@ -52,6 +64,8 @@ func TestNewCredentialsWithTokens(t *testing.T) {
 }
 
 func TestNewCredentialsWithTokens_Validation(t *testing.T) {
+	t.Parallel()
+
 	tests := []struct {
 		name        string
 		appleID     string
@@ -66,11 +80,16 @@ func TestNewCredentialsWithTokens_Validation(t *testing.T) {
 	}
 
 	for _, tt := range tests {
+		tt := tt
+
 		t.Run(tt.name, func(t *testing.T) {
-			_, err := NewCredentialsWithTokens(tt.appleID, tt.token, tt.dsid)
+			t.Parallel()
+
+			_, err := valueobject.NewCredentialsWithTokens(tt.appleID, tt.token, tt.dsid)
 			if tt.expectError && err == nil {
 				t.Error("Expected error but got none")
 			}
+
 			if !tt.expectError && err != nil {
 				t.Errorf("Unexpected error: %v", err)
 			}
@@ -79,8 +98,14 @@ func TestNewCredentialsWithTokens_Validation(t *testing.T) {
 }
 
 func TestCredentials_CanPurchase(t *testing.T) {
+	t.Parallel()
+
 	// Without kbsync
-	creds, _ := NewCredentialsWithTokens("test@example.com", "token", "123")
+	creds, err := valueobject.NewCredentialsWithTokens("test@example.com", "token", "123")
+	if err != nil {
+		t.Fatalf("Failed to create credentials: %v", err)
+	}
+
 	if creds.CanPurchase() {
 		t.Error("Credentials without kbsync should not be able to purchase")
 	}
@@ -92,7 +117,11 @@ func TestCredentials_CanPurchase(t *testing.T) {
 	}
 
 	// Not authenticated
-	creds2, _ := NewCredentials("test@example.com")
+	creds2, err := valueobject.NewCredentials("test@example.com")
+	if err != nil {
+		t.Fatalf("Failed to create credentials: %v", err)
+	}
+
 	creds2.SetKbsync("test_kbsync")
 	if creds2.CanPurchase() {
 		t.Error("Unauthenticated credentials should not be able to purchase")
@@ -100,9 +129,22 @@ func TestCredentials_CanPurchase(t *testing.T) {
 }
 
 func TestCredentials_Equals(t *testing.T) {
-	creds1, _ := NewCredentialsWithTokens("test@example.com", "token", "123")
-	creds2, _ := NewCredentialsWithTokens("test@example.com", "token", "123")
-	creds3, _ := NewCredentialsWithTokens("other@example.com", "token", "123")
+	t.Parallel()
+
+	creds1, err := valueobject.NewCredentialsWithTokens("test@example.com", "token", "123")
+	if err != nil {
+		t.Fatalf("Failed to create credentials1: %v", err)
+	}
+
+	creds2, err := valueobject.NewCredentialsWithTokens("test@example.com", "token", "123")
+	if err != nil {
+		t.Fatalf("Failed to create credentials2: %v", err)
+	}
+
+	creds3, err := valueobject.NewCredentialsWithTokens("other@example.com", "token", "123")
+	if err != nil {
+		t.Fatalf("Failed to create credentials3: %v", err)
+	}
 
 	if !creds1.Equals(creds2) {
 		t.Error("Same credentials should be equal")

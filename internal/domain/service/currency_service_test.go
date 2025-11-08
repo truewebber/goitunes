@@ -1,9 +1,15 @@
-package service
+package service_test
 
-import "testing"
+import (
+	"testing"
+
+	"github.com/truewebber/goitunes/v2/internal/domain/service"
+)
 
 func TestCurrencyService_ExtractCurrency(t *testing.T) {
-	service := NewCurrencyService()
+	t.Parallel()
+
+	currencyService := service.NewCurrencyService()
 
 	tests := []struct {
 		name           string
@@ -23,8 +29,12 @@ func TestCurrencyService_ExtractCurrency(t *testing.T) {
 	}
 
 	for _, tt := range tests {
+		tt := tt
+
 		t.Run(tt.name, func(t *testing.T) {
-			result := service.ExtractCurrency(tt.price, tt.formattedPrice)
+			t.Parallel()
+
+			result := currencyService.ExtractCurrency(tt.price, tt.formattedPrice)
 			if result != tt.expected {
 				t.Errorf("Expected %q, got %q", tt.expected, result)
 			}
@@ -33,7 +43,9 @@ func TestCurrencyService_ExtractCurrency(t *testing.T) {
 }
 
 func TestCurrencyService_FormatPrice(t *testing.T) {
-	service := NewCurrencyService()
+	t.Parallel()
+
+	currencyService := service.NewCurrencyService()
 
 	tests := []struct {
 		name     string
@@ -48,8 +60,12 @@ func TestCurrencyService_FormatPrice(t *testing.T) {
 	}
 
 	for _, tt := range tests {
+		tt := tt
+
 		t.Run(tt.name, func(t *testing.T) {
-			result := service.FormatPrice(tt.price, tt.currency)
+			t.Parallel()
+
+			result := currencyService.FormatPrice(tt.price, tt.currency)
 			if result != tt.expected {
 				t.Errorf("Expected %q, got %q", tt.expected, result)
 			}

@@ -1,60 +1,80 @@
-package entity
+package entity_test
 
 import (
 	"testing"
 	"time"
+
+	"github.com/truewebber/goitunes/v2/internal/domain/entity"
+)
+
+const (
+	testRatingValue = 4.5
 )
 
 func TestNewApplication(t *testing.T) {
+	t.Parallel()
+
 	adamID := "123456"
 	bundleID := "com.test.app"
 	name := "Test App"
 
-	app := NewApplication(adamID, bundleID, name)
+	app := entity.NewApplication(adamID, bundleID, name)
 
 	if app.AdamID() != adamID {
 		t.Errorf("Expected adamID %s, got %s", adamID, app.AdamID())
 	}
+
 	if app.BundleID() != bundleID {
 		t.Errorf("Expected bundleID %s, got %s", bundleID, app.BundleID())
 	}
+
 	if app.Name() != name {
 		t.Errorf("Expected name %s, got %s", name, app.Name())
 	}
 }
 
 func TestApplication_SettersAndGetters(t *testing.T) {
-	app := NewApplication("123", "com.test", "Test")
+	t.Parallel()
+
+	app := entity.NewApplication("123", "com.test", "Test")
 
 	// Test price and currency
 	app.SetPrice(9.99, "USD")
+
 	if app.Price() != 9.99 {
 		t.Errorf("Expected price 9.99, got %f", app.Price())
 	}
+
 	if app.Currency() != "USD" {
 		t.Errorf("Expected currency USD, got %s", app.Currency())
 	}
 
 	// Test rating
-	app.SetRating(4.5, 1000)
-	if app.Rating() != 4.5 {
-		t.Errorf("Expected rating 4.5, got %f", app.Rating())
+	app.SetRating(testRatingValue, 1000)
+
+	if app.Rating() != testRatingValue {
+		t.Errorf("Expected rating %f, got %f", testRatingValue, app.Rating())
 	}
+
 	if app.RatingCount() != 1000 {
 		t.Errorf("Expected rating count 1000, got %d", app.RatingCount())
 	}
 
 	// Test version
 	app.SetVersion("1.0.0", 123456)
+
 	if app.Version() != "1.0.0" {
 		t.Errorf("Expected version 1.0.0, got %s", app.Version())
 	}
+
 	if app.VersionID() != 123456 {
 		t.Errorf("Expected versionID 123456, got %d", app.VersionID())
 	}
 }
 
 func TestApplication_IsFree(t *testing.T) {
+	t.Parallel()
+
 	tests := []struct {
 		name     string
 		price    float64
@@ -66,8 +86,12 @@ func TestApplication_IsFree(t *testing.T) {
 	}
 
 	for _, tt := range tests {
+		tt := tt
+
 		t.Run(tt.name, func(t *testing.T) {
-			app := NewApplication("123", "com.test", "Test")
+			t.Parallel()
+
+			app := entity.NewApplication("123", "com.test", "Test")
 			app.SetPrice(tt.price, "USD")
 
 			if app.IsFree() != tt.expected {
@@ -78,6 +102,8 @@ func TestApplication_IsFree(t *testing.T) {
 }
 
 func TestApplication_IsUniversal(t *testing.T) {
+	t.Parallel()
+
 	tests := []struct {
 		name     string
 		families []string
@@ -91,8 +117,12 @@ func TestApplication_IsUniversal(t *testing.T) {
 	}
 
 	for _, tt := range tests {
+		tt := tt
+
 		t.Run(tt.name, func(t *testing.T) {
-			app := NewApplication("123", "com.test", "Test")
+			t.Parallel()
+
+			app := entity.NewApplication("123", "com.test", "Test")
 			app.SetDeviceFamilies(tt.families)
 
 			if app.IsUniversal() != tt.expected {
@@ -103,13 +133,15 @@ func TestApplication_IsUniversal(t *testing.T) {
 }
 
 func TestApplication_BuilderPattern(t *testing.T) {
+	t.Parallel()
+
 	releaseDate := time.Now()
 
-	app := NewApplication("123", "com.test", "Test").
+	app := entity.NewApplication("123", "com.test", "Test").
 		SetArtistName("Test Artist").
 		SetArtistID("456").
 		SetPrice(4.99, "USD").
-		SetRating(4.5, 100).
+		SetRating(testRatingValue, 100).
 		SetVersion("1.0", 1).
 		SetReleaseDate(releaseDate).
 		SetGenre("1", "Games").
@@ -121,14 +153,16 @@ func TestApplication_BuilderPattern(t *testing.T) {
 	if app.ArtistName() != "Test Artist" {
 		t.Error("Builder pattern failed for ArtistName")
 	}
+
 	if app.Price() != 4.99 {
 		t.Error("Builder pattern failed for Price")
 	}
-	if app.Rating() != 4.5 {
+
+	if app.Rating() != testRatingValue {
 		t.Error("Builder pattern failed for Rating")
 	}
+
 	if !app.ReleaseDate().Equal(releaseDate) {
 		t.Error("Builder pattern failed for ReleaseDate")
 	}
 }
-
