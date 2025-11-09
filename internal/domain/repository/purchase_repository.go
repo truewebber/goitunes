@@ -6,6 +6,8 @@ import (
 	"github.com/truewebber/goitunes/v2/internal/domain/entity"
 )
 
+//go:generate mockgen -source=purchase_repository.go -destination=mocks/mock_purchase_repository.go -package=mocks
+
 // PurchaseRepository defines the interface for purchase and download operations.
 type PurchaseRepository interface {
 	// Purchase initiates a purchase for an application

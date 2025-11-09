@@ -6,6 +6,8 @@ import (
 	"github.com/truewebber/goitunes/v2/internal/domain/entity"
 )
 
+//go:generate mockgen -source=application_repository.go -destination=mocks/mock_application_repository.go -package=mocks
+
 // ApplicationRepository defines the interface for application data access.
 type ApplicationRepository interface {
 	// FindByAdamID finds applications by their Adam IDs

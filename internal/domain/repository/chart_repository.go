@@ -6,6 +6,8 @@ import (
 	"github.com/truewebber/goitunes/v2/internal/domain/entity"
 )
 
+//go:generate mockgen -source=chart_repository.go -destination=mocks/mock_chart_repository.go -package=mocks
+
 // ChartRepository defines the interface for chart data access.
 type ChartRepository interface {
 	// GetTop200 retrieves the top 200 applications for a genre and chart type

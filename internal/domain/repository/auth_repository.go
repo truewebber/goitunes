@@ -6,6 +6,8 @@ import (
 	"github.com/truewebber/goitunes/v2/internal/domain/valueobject"
 )
 
+//go:generate mockgen -source=auth_repository.go -destination=mocks/mock_auth_repository.go -package=mocks
+
 // AuthRepository defines the interface for authentication operations.
 type AuthRepository interface {
 	// Authenticate performs authentication with Apple ID and password

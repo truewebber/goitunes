@@ -5,6 +5,8 @@ import (
 	"net/http"
 )
 
+//go:generate mockgen -source=client.go -destination=mocks/mock_client.go -package=mocks
+
 // Client is an interface for HTTP client operations.
 type Client interface {
 	Do(req *http.Request) (*http.Response, error)
