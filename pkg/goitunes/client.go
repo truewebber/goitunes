@@ -35,9 +35,9 @@ type Client struct {
 func New(region string, opts ...Option) (*Client, error) {
 	storeRegistry := config.NewStoreRegistry()
 
-	store, err := storeRegistry.GetStore(region)
-	if err != nil {
-		return nil, fmt.Errorf("%w: %s", ErrUnsupportedRegion, region)
+	store, storeErr := storeRegistry.GetStore(region)
+	if storeErr != nil {
+		return nil, fmt.Errorf("get store: %w", storeErr)
 	}
 
 	client := &Client{
@@ -46,9 +46,8 @@ func New(region string, opts ...Option) (*Client, error) {
 		storeRegistry: storeRegistry,
 	}
 
-	//nolint:gocritic // err is already declared, using = to avoid shadow
-	if err = client.applyOptions(opts); err != nil {
-		return nil, err
+	if err := client.applyOptions(opts); err != nil {
+		return nil, fmt.Errorf("apply options: %w", err)
 	}
 
 	client.setDefaultDevice()

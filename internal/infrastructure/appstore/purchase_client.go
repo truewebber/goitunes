@@ -53,30 +53,29 @@ func (c *PurchaseClient) Purchase(
 		return nil, ErrCredentialsDoNotSupportPurchasing
 	}
 
-	purchaseResp, err := c.buyApplication(ctx, adamID, versionID, repository.PricingParameterBuy)
-	if err != nil {
-		return nil, err
+	purchaseResp, buyErr := c.buyApplication(ctx, adamID, versionID, repository.PricingParameterBuy)
+	if buyErr != nil {
+		return nil, fmt.Errorf("buy application: %w", buyErr)
 	}
 
-	//nolint:gocritic // err is already declared, using = to avoid shadow
-	if err = c.validatePurchaseResponse(purchaseResp, adamID); err != nil {
-		return nil, err
+	if err := c.validatePurchaseResponse(purchaseResp, adamID); err != nil {
+		return nil, fmt.Errorf("validate purchase response: %w", err)
 	}
 
 	song := purchaseResp.SongList[0]
 
-	if err = c.ConfirmDownload(ctx, song.DownloadID); err != nil {
-		return nil, fmt.Errorf("failed to confirm download: %w", err)
+	if err := c.ConfirmDownload(ctx, song.DownloadID); err != nil {
+		return nil, fmt.Errorf("confirm download: %w", err)
 	}
 
 	sinf, err := c.extractSINF(&song, adamID)
 	if err != nil {
-		return nil, err
+		return nil, fmt.Errorf("extract sinf: %w", err)
 	}
 
 	bundleID, err := c.extractBundleID(&song, adamID)
 	if err != nil {
-		return nil, err
+		return nil, fmt.Errorf("extract bundle id: %w", err)
 	}
 
 	return c.buildDownloadInfo(&song, bundleID, sinf), nil

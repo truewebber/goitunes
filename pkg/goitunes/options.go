@@ -19,7 +19,24 @@ func WithHTTPClient(httpClient infrahttp.Client) Option {
 	}
 }
 
-// WithCredentials sets authentication credentials.
+// WithAppleID sets the Apple ID for authentication.
+// Use this when you plan to authenticate later via Login().
+// Tokens will be set automatically after successful login.
+func WithAppleID(appleID string) Option {
+	return func(c *Client) error {
+		credentials, err := valueobject.NewCredentials(appleID)
+		if err != nil {
+			return fmt.Errorf("failed to create credentials: %w", err)
+		}
+
+		c.credentials = credentials
+
+		return nil
+	}
+}
+
+// WithCredentials sets authentication credentials with tokens.
+// Use this when you already have passwordToken and dsid.
 func WithCredentials(appleID, passwordToken, dsid string) Option {
 	return func(c *Client) error {
 		credentials, err := valueobject.NewCredentialsWithTokens(appleID, passwordToken, dsid)

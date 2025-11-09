@@ -47,7 +47,7 @@ func getEnvVars() (appleID, password, guid, machineName string) {
 
 func createClient(appleID, guid, machineName string) *goitunes.Client {
 	client, err := goitunes.New("us",
-		goitunes.WithCredentials(appleID, "", ""), // Empty tokens will be filled after login
+		goitunes.WithAppleID(appleID), // Tokens will be filled after login
 		goitunes.WithDevice(guid, machineName, goitunes.UserAgentWindows),
 	)
 	if err != nil {

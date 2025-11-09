@@ -41,6 +41,9 @@ var (
 	// ErrDSIDNotFound is returned when DSID is not found in response.
 	ErrDSIDNotFound = errors.New("DSID not found in response")
 
+	// ErrAuthenticationFailed is returned when authentication fails.
+	ErrAuthenticationFailed = errors.New("authentication failed")
+
 	// ErrAdamIDNotFound is returned when Adam ID is not found in response.
 	ErrAdamIDNotFound = errors.New("adamID not found in response")
 

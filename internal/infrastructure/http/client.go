@@ -16,9 +16,16 @@ type DefaultClient struct {
 }
 
 // NewDefaultClient creates a new default HTTP client.
+// Redirects are handled manually, so CheckRedirect returns an error to prevent automatic following.
 func NewDefaultClient() *DefaultClient {
 	return &DefaultClient{
-		client: &http.Client{},
+		client: &http.Client{
+			CheckRedirect: func(_ *http.Request, _ []*http.Request) error {
+				// Return error to prevent automatic redirect following
+				// We handle redirects manually in auth_client.go
+				return http.ErrUseLastResponse
+			},
+		},
 	}
 }
 
