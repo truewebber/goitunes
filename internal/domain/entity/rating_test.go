@@ -101,17 +101,22 @@ func TestRating_EdgeCases(t *testing.T) {
 func TestRating_PublicFields(t *testing.T) {
 	t.Parallel()
 
+	const (
+		testRatingValue = 4.8
+		testRatingCount = 250
+	)
+
 	// Test that Rating fields are public and can be accessed directly
 	rating := &entity.Rating{}
 
-	rating.Value = 4.8
-	rating.Count = 250
+	rating.Value = testRatingValue
+	rating.Count = testRatingCount
 
-	if rating.Value != 4.8 {
+	if rating.Value != testRatingValue {
 		t.Error("Value field should be directly accessible")
 	}
 
-	if rating.Count != 250 {
+	if rating.Count != testRatingCount {
 		t.Error("Count field should be directly accessible")
 	}
 }
@@ -119,17 +124,22 @@ func TestRating_PublicFields(t *testing.T) {
 func TestRating_Modification(t *testing.T) {
 	t.Parallel()
 
+	const (
+		newRatingValue = 4.5
+		newRatingCount = 200
+	)
+
 	rating := &entity.Rating{Value: 4.0, Count: 100}
 
 	// Modify values
-	rating.Value = 4.5
-	rating.Count = 200
+	rating.Value = newRatingValue
+	rating.Count = newRatingCount
 
-	if rating.Value != 4.5 {
+	if rating.Value != newRatingValue {
 		t.Error("Value should be modifiable")
 	}
 
-	if rating.Count != 200 {
+	if rating.Count != newRatingCount {
 		t.Error("Count should be modifiable")
 	}
 }

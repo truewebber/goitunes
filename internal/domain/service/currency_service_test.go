@@ -177,6 +177,7 @@ func TestNewCurrencyService(t *testing.T) {
 	if result1 != "$" {
 		t.Errorf("svc1: Expected $, got %q", result1)
 	}
+
 	if result2 != "€" {
 		t.Errorf("svc2: Expected €, got %q", result2)
 	}

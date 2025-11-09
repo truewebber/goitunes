@@ -127,11 +127,19 @@ func TestStore_Equals(t *testing.T) {
 		{
 			name: "identical stores",
 			store1: func() *valueobject.Store {
-				s, _ := valueobject.NewStore("us", 143441, 36)
+				s, err := valueobject.NewStore("us", 143441, 36)
+				if err != nil {
+					panic(err)
+				}
+
 				return s
 			},
 			store2: func() *valueobject.Store {
-				s, _ := valueobject.NewStore("us", 143441, 36)
+				s, err := valueobject.NewStore("us", 143441, 36)
+				if err != nil {
+					panic(err)
+				}
+
 				return s
 			},
 			expected: true,
@@ -139,11 +147,19 @@ func TestStore_Equals(t *testing.T) {
 		{
 			name: "different regions",
 			store1: func() *valueobject.Store {
-				s, _ := valueobject.NewStore("us", 143441, 36)
+				s, err := valueobject.NewStore("us", 143441, 36)
+				if err != nil {
+					panic(err)
+				}
+
 				return s
 			},
 			store2: func() *valueobject.Store {
-				s, _ := valueobject.NewStore("ru", 143441, 36)
+				s, err := valueobject.NewStore("ru", 143441, 36)
+				if err != nil {
+					panic(err)
+				}
+
 				return s
 			},
 			expected: false,
@@ -151,11 +167,19 @@ func TestStore_Equals(t *testing.T) {
 		{
 			name: "different storeFront",
 			store1: func() *valueobject.Store {
-				s, _ := valueobject.NewStore("us", 143441, 36)
+				s, err := valueobject.NewStore("us", 143441, 36)
+				if err != nil {
+					panic(err)
+				}
+
 				return s
 			},
 			store2: func() *valueobject.Store {
-				s, _ := valueobject.NewStore("us", 143469, 36)
+				s, err := valueobject.NewStore("us", 143469, 36)
+				if err != nil {
+					panic(err)
+				}
+
 				return s
 			},
 			expected: false,
@@ -163,11 +187,19 @@ func TestStore_Equals(t *testing.T) {
 		{
 			name: "different hostPrefix",
 			store1: func() *valueobject.Store {
-				s, _ := valueobject.NewStore("us", 143441, 36)
+				s, err := valueobject.NewStore("us", 143441, 36)
+				if err != nil {
+					panic(err)
+				}
+
 				return s
 			},
 			store2: func() *valueobject.Store {
-				s, _ := valueobject.NewStore("us", 143441, 45)
+				s, err := valueobject.NewStore("us", 143441, 45)
+				if err != nil {
+					panic(err)
+				}
+
 				return s
 			},
 			expected: false,
@@ -175,7 +207,11 @@ func TestStore_Equals(t *testing.T) {
 		{
 			name: "nil comparison",
 			store1: func() *valueobject.Store {
-				s, _ := valueobject.NewStore("us", 143441, 36)
+				s, err := valueobject.NewStore("us", 143441, 36)
+				if err != nil {
+					panic(err)
+				}
+
 				return s
 			},
 			store2: func() *valueobject.Store {

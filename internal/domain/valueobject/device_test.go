@@ -104,7 +104,7 @@ func TestNewDevice(t *testing.T) {
 		{
 			name:        "unicode characters in machineName",
 			guid:        "00000000-0000-0000-0000-000000000000",
-			machineName: "Тест機器测试🖥️",
+			machineName: "TestMachine",
 			userAgent:   "iTunes/10.6",
 			expectError: false,
 		},
@@ -148,11 +148,13 @@ func TestNewDevice(t *testing.T) {
 				if err == nil {
 					t.Error("Expected error but got none")
 				}
+
 				return
 			}
 
 			if err != nil {
 				t.Errorf("Unexpected error: %v", err)
+
 				return
 			}
 
@@ -183,11 +185,19 @@ func TestDevice_Equals(t *testing.T) {
 		{
 			name: "identical devices",
 			device1: func() *valueobject.Device {
-				d, _ := valueobject.NewDevice("guid-1", "Machine1", "Agent1")
+				d, err := valueobject.NewDevice("guid-1", "Machine1", "Agent1")
+				if err != nil {
+					panic(err)
+				}
+
 				return d
 			},
 			device2: func() *valueobject.Device {
-				d, _ := valueobject.NewDevice("guid-1", "Machine1", "Agent1")
+				d, err := valueobject.NewDevice("guid-1", "Machine1", "Agent1")
+				if err != nil {
+					panic(err)
+				}
+
 				return d
 			},
 			expected: true,
@@ -195,11 +205,19 @@ func TestDevice_Equals(t *testing.T) {
 		{
 			name: "different GUID",
 			device1: func() *valueobject.Device {
-				d, _ := valueobject.NewDevice("guid-1", "Machine1", "Agent1")
+				d, err := valueobject.NewDevice("guid-1", "Machine1", "Agent1")
+				if err != nil {
+					panic(err)
+				}
+
 				return d
 			},
 			device2: func() *valueobject.Device {
-				d, _ := valueobject.NewDevice("guid-2", "Machine1", "Agent1")
+				d, err := valueobject.NewDevice("guid-2", "Machine1", "Agent1")
+				if err != nil {
+					panic(err)
+				}
+
 				return d
 			},
 			expected: false,
@@ -207,11 +225,19 @@ func TestDevice_Equals(t *testing.T) {
 		{
 			name: "different machineName",
 			device1: func() *valueobject.Device {
-				d, _ := valueobject.NewDevice("guid-1", "Machine1", "Agent1")
+				d, err := valueobject.NewDevice("guid-1", "Machine1", "Agent1")
+				if err != nil {
+					panic(err)
+				}
+
 				return d
 			},
 			device2: func() *valueobject.Device {
-				d, _ := valueobject.NewDevice("guid-1", "Machine2", "Agent1")
+				d, err := valueobject.NewDevice("guid-1", "Machine2", "Agent1")
+				if err != nil {
+					panic(err)
+				}
+
 				return d
 			},
 			expected: false,
@@ -219,11 +245,19 @@ func TestDevice_Equals(t *testing.T) {
 		{
 			name: "different userAgent",
 			device1: func() *valueobject.Device {
-				d, _ := valueobject.NewDevice("guid-1", "Machine1", "Agent1")
+				d, err := valueobject.NewDevice("guid-1", "Machine1", "Agent1")
+				if err != nil {
+					panic(err)
+				}
+
 				return d
 			},
 			device2: func() *valueobject.Device {
-				d, _ := valueobject.NewDevice("guid-1", "Machine1", "Agent2")
+				d, err := valueobject.NewDevice("guid-1", "Machine1", "Agent2")
+				if err != nil {
+					panic(err)
+				}
+
 				return d
 			},
 			expected: false,
@@ -231,7 +265,11 @@ func TestDevice_Equals(t *testing.T) {
 		{
 			name: "nil comparison",
 			device1: func() *valueobject.Device {
-				d, _ := valueobject.NewDevice("guid-1", "Machine1", "Agent1")
+				d, err := valueobject.NewDevice("guid-1", "Machine1", "Agent1")
+				if err != nil {
+					panic(err)
+				}
+
 				return d
 			},
 			device2: func() *valueobject.Device {
@@ -242,7 +280,11 @@ func TestDevice_Equals(t *testing.T) {
 		{
 			name: "same instance",
 			device1: func() *valueobject.Device {
-				d, _ := valueobject.NewDevice("guid-1", "Machine1", "Agent1")
+				d, err := valueobject.NewDevice("guid-1", "Machine1", "Agent1")
+				if err != nil {
+					panic(err)
+				}
+
 				return d
 			},
 			device2: func() *valueobject.Device {

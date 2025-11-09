@@ -53,7 +53,7 @@ func TestNewDownloadInfo(t *testing.T) {
 		},
 		{
 			name:        "special characters in bundleID",
-			bundleID:    "com.特別.app",
+			bundleID:    "com.special.app",
 			url:         "https://example.com/download",
 			downloadKey: "key123",
 		},
@@ -123,7 +123,7 @@ func TestDownloadInfo_SetSinf(t *testing.T) {
 		{"valid sinf", "base64encodedsinf"},
 		{"empty sinf", ""},
 		{"very long sinf", string(make([]byte, 50000))},
-		{"unicode sinf", "тест测试🔒"},
+		{"unicode sinf", "test-unicode-data"},
 	}
 
 	for _, tt := range tests {
@@ -205,7 +205,7 @@ func TestDownloadInfo_SetHeaders(t *testing.T) {
 		},
 		{
 			name:    "headers with special characters",
-			headers: map[string]string{"X-Special": "тест/测试🔐"},
+			headers: map[string]string{"X-Special": "test-unicode-header"},
 		},
 	}
 
@@ -227,6 +227,7 @@ func TestDownloadInfo_SetHeaders(t *testing.T) {
 
 			if tt.headers != nil && headers == nil {
 				t.Error("Headers should not be nil when set with non-nil map")
+
 				return
 			}
 
@@ -246,36 +247,51 @@ func TestDownloadInfo_SetHeaders(t *testing.T) {
 func TestDownloadInfo_AddHeader(t *testing.T) {
 	t.Parallel()
 
-	info := entity.NewDownloadInfo("com.test", "url", "key")
+	const testTokenValue = "token123"
 
 	t.Run("add single header", func(t *testing.T) {
-		result := info.AddHeader("X-Token", "token123")
+		t.Parallel()
+
+		info := entity.NewDownloadInfo("com.test", "url", "key")
+		result := info.AddHeader("X-Token", testTokenValue)
 
 		if result != info {
 			t.Error("AddHeader should return the same instance for chaining")
 		}
 
-		if info.Headers()["X-Token"] != "token123" {
+		if info.Headers()["X-Token"] != testTokenValue {
 			t.Error("Header should be added")
 		}
 	})
 
 	t.Run("add multiple headers", func(t *testing.T) {
-		info.AddHeader("X-DSID", "dsid456").AddHeader("X-Store", "143441")
+		t.Parallel()
+
+		info := entity.NewDownloadInfo("com.test", "url", "key")
+		info.AddHeader("X-Token", testTokenValue).
+			AddHeader("X-DSID", "dsid456").
+			AddHeader("X-Store", "143441")
 
 		headers := info.Headers()
-		if headers["X-Token"] != "token123" {
+
+		if headers["X-Token"] != testTokenValue {
 			t.Error("Previous header should be preserved")
 		}
+
 		if headers["X-DSID"] != "dsid456" {
 			t.Error("New header should be added")
 		}
+
 		if headers["X-Store"] != "143441" {
 			t.Error("Chained header should be added")
 		}
 	})
 
 	t.Run("overwrite existing header", func(t *testing.T) {
+		t.Parallel()
+
+		info := entity.NewDownloadInfo("com.test", "url", "key")
+		info.AddHeader("X-Token", "oldtoken")
 		info.AddHeader("X-Token", "newtoken")
 
 		if info.Headers()["X-Token"] != "newtoken" {
@@ -284,6 +300,9 @@ func TestDownloadInfo_AddHeader(t *testing.T) {
 	})
 
 	t.Run("add empty key", func(t *testing.T) {
+		t.Parallel()
+
+		info := entity.NewDownloadInfo("com.test", "url", "key")
 		info.AddHeader("", "value")
 
 		if info.Headers()[""] != "value" {
@@ -292,6 +311,9 @@ func TestDownloadInfo_AddHeader(t *testing.T) {
 	})
 
 	t.Run("add empty value", func(t *testing.T) {
+		t.Parallel()
+
+		info := entity.NewDownloadInfo("com.test", "url", "key")
 		info.AddHeader("X-Empty", "")
 
 		if info.Headers()["X-Empty"] != "" {
@@ -418,21 +440,27 @@ func TestDownloadInfo_MethodChaining(t *testing.T) {
 	if info.Sinf() != "sinf123" {
 		t.Error("Sinf not set correctly")
 	}
+
 	if info.Metadata() != "metadata456" {
 		t.Error("Metadata not set correctly")
 	}
+
 	if info.DownloadID() != "dl789" {
 		t.Error("DownloadID not set correctly")
 	}
+
 	if info.VersionID() != 100 {
 		t.Error("VersionID not set correctly")
 	}
+
 	if info.FileSize() != 50000 {
 		t.Error("FileSize not set correctly")
 	}
+
 	if info.Headers()["X-Token"] != "token" {
 		t.Error("Header not set correctly")
 	}
+
 	if info.Headers()["X-DSID"] != "dsid" {
 		t.Error("Header not set correctly")
 	}

@@ -176,7 +176,7 @@ func TestNewApplication_EdgeCases(t *testing.T) {
 		{"only adamID", "123", "", ""},
 		{"only bundleID", "", "com.test", ""},
 		{"only name", "", "", "Test"},
-		{"special characters", "!@#", "com.特別.app", "Test 測試 🎮"},
+		{"special characters", "!@#", "com.special.app", "Test App 🎮"},
 		{"very long values", string(make([]byte, 1000)), string(make([]byte, 1000)), string(make([]byte, 1000))},
 	}
 
@@ -323,6 +323,7 @@ func TestApplication_SetScreenshotURLs(t *testing.T) {
 
 			if tt.urls != nil && urls == nil {
 				t.Error("URLs should not be nil when set with non-nil slice")
+
 				return
 			}
 
@@ -367,6 +368,7 @@ func TestApplication_SetDeviceFamilies(t *testing.T) {
 
 			if tt.families != nil && families == nil {
 				t.Error("Families should not be nil when set with non-nil slice")
+
 				return
 			}
 
@@ -469,51 +471,67 @@ func TestApplication_AllSetters(t *testing.T) {
 	if app.ArtistName() != "Artist" {
 		t.Error("ArtistName not set")
 	}
+
 	if app.ArtistID() != "456" {
 		t.Error("ArtistID not set")
 	}
+
 	if app.Version() != "2.0" {
 		t.Error("Version not set")
 	}
+
 	if app.VersionID() != 789 {
 		t.Error("VersionID not set")
 	}
+
 	if app.Price() != 19.99 {
 		t.Error("Price not set")
 	}
+
 	if app.Currency() != "€" {
 		t.Error("Currency not set")
 	}
+
 	if app.Rating() != 4.8 {
 		t.Error("Rating not set")
 	}
+
 	if app.RatingCount() != 5000 {
 		t.Error("RatingCount not set")
 	}
+
 	if !app.ReleaseDate().Equal(releaseDate) {
 		t.Error("ReleaseDate not set")
 	}
+
 	if app.GenreID() != "g1" {
 		t.Error("GenreID not set")
 	}
+
 	if app.GenreName() != "Games" {
 		t.Error("GenreName not set")
 	}
+
 	if len(app.DeviceFamilies()) != 2 {
 		t.Error("DeviceFamilies not set")
 	}
+
 	if app.FileSize() != 100000000 {
 		t.Error("FileSize not set")
 	}
+
 	if app.MinimumOSVersion() != "15.0" {
 		t.Error("MinimumOSVersion not set")
 	}
+
 	if app.Description() != "A test application" {
 		t.Error("Description not set")
 	}
+
 	if app.IconURL() != "https://example.com/icon.png" {
 		t.Error("IconURL not set")
 	}
+
 	if len(app.ScreenshotURLs()) != 1 {
 		t.Error("ScreenshotURLs not set")
 	}

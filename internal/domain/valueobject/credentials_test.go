@@ -220,7 +220,11 @@ func TestCredentials_StateTransitions(t *testing.T) {
 		{
 			name: "unauthenticated",
 			setup: func() *valueobject.Credentials {
-				creds, _ := valueobject.NewCredentials(testAppleID)
+				creds, err := valueobject.NewCredentials(testAppleID)
+				if err != nil {
+					panic(err)
+				}
+
 				return creds
 			},
 			isAuthenticated: false,
@@ -230,7 +234,11 @@ func TestCredentials_StateTransitions(t *testing.T) {
 		{
 			name: "authenticated without kbsync",
 			setup: func() *valueobject.Credentials {
-				creds, _ := valueobject.NewCredentialsWithTokens(testAppleID, "token", "123")
+				creds, err := valueobject.NewCredentialsWithTokens(testAppleID, "token", "123")
+				if err != nil {
+					panic(err)
+				}
+
 				return creds
 			},
 			isAuthenticated: true,
@@ -240,8 +248,12 @@ func TestCredentials_StateTransitions(t *testing.T) {
 		{
 			name: "authenticated with kbsync",
 			setup: func() *valueobject.Credentials {
-				creds, _ := valueobject.NewCredentialsWithTokens(testAppleID, "token", "123")
+				creds, err := valueobject.NewCredentialsWithTokens(testAppleID, "token", "123")
+				if err != nil {
+					panic(err)
+				}
 				creds.SetKbsync("kbsync")
+
 				return creds
 			},
 			isAuthenticated: true,
@@ -251,8 +263,12 @@ func TestCredentials_StateTransitions(t *testing.T) {
 		{
 			name: "unauthenticated with kbsync",
 			setup: func() *valueobject.Credentials {
-				creds, _ := valueobject.NewCredentials(testAppleID)
+				creds, err := valueobject.NewCredentials(testAppleID)
+				if err != nil {
+					panic(err)
+				}
 				creds.SetKbsync("kbsync")
+
 				return creds
 			},
 			isAuthenticated: false,
@@ -262,8 +278,12 @@ func TestCredentials_StateTransitions(t *testing.T) {
 		{
 			name: "authenticated then reset token",
 			setup: func() *valueobject.Credentials {
-				creds, _ := valueobject.NewCredentialsWithTokens(testAppleID, "token", "123")
+				creds, err := valueobject.NewCredentialsWithTokens(testAppleID, "token", "123")
+				if err != nil {
+					panic(err)
+				}
 				creds.SetPasswordToken("")
+
 				return creds
 			},
 			isAuthenticated: false,
@@ -294,6 +314,8 @@ func TestCredentials_StateTransitions(t *testing.T) {
 func TestCredentials_Equals(t *testing.T) {
 	t.Parallel()
 
+	const sameInstanceName = "same instance"
+
 	tests := []struct {
 		name     string
 		creds1   func() *valueobject.Credentials
@@ -303,11 +325,19 @@ func TestCredentials_Equals(t *testing.T) {
 		{
 			name: "identical credentials",
 			creds1: func() *valueobject.Credentials {
-				c, _ := valueobject.NewCredentialsWithTokens(testAppleID, "token", "123")
+				c, err := valueobject.NewCredentialsWithTokens(testAppleID, "token", "123")
+				if err != nil {
+					panic(err)
+				}
+
 				return c
 			},
 			creds2: func() *valueobject.Credentials {
-				c, _ := valueobject.NewCredentialsWithTokens(testAppleID, "token", "123")
+				c, err := valueobject.NewCredentialsWithTokens(testAppleID, "token", "123")
+				if err != nil {
+					panic(err)
+				}
+
 				return c
 			},
 			expected: true,
@@ -315,11 +345,19 @@ func TestCredentials_Equals(t *testing.T) {
 		{
 			name: "different appleID",
 			creds1: func() *valueobject.Credentials {
-				c, _ := valueobject.NewCredentialsWithTokens(testAppleID, "token", "123")
+				c, err := valueobject.NewCredentialsWithTokens(testAppleID, "token", "123")
+				if err != nil {
+					panic(err)
+				}
+
 				return c
 			},
 			creds2: func() *valueobject.Credentials {
-				c, _ := valueobject.NewCredentialsWithTokens("other@example.com", "token", "123")
+				c, err := valueobject.NewCredentialsWithTokens("other@example.com", "token", "123")
+				if err != nil {
+					panic(err)
+				}
+
 				return c
 			},
 			expected: false,
@@ -327,11 +365,19 @@ func TestCredentials_Equals(t *testing.T) {
 		{
 			name: "different passwordToken",
 			creds1: func() *valueobject.Credentials {
-				c, _ := valueobject.NewCredentialsWithTokens(testAppleID, "token1", "123")
+				c, err := valueobject.NewCredentialsWithTokens(testAppleID, "token1", "123")
+				if err != nil {
+					panic(err)
+				}
+
 				return c
 			},
 			creds2: func() *valueobject.Credentials {
-				c, _ := valueobject.NewCredentialsWithTokens(testAppleID, "token2", "123")
+				c, err := valueobject.NewCredentialsWithTokens(testAppleID, "token2", "123")
+				if err != nil {
+					panic(err)
+				}
+
 				return c
 			},
 			expected: false,
@@ -339,11 +385,19 @@ func TestCredentials_Equals(t *testing.T) {
 		{
 			name: "different dsid",
 			creds1: func() *valueobject.Credentials {
-				c, _ := valueobject.NewCredentialsWithTokens(testAppleID, "token", "123")
+				c, err := valueobject.NewCredentialsWithTokens(testAppleID, "token", "123")
+				if err != nil {
+					panic(err)
+				}
+
 				return c
 			},
 			creds2: func() *valueobject.Credentials {
-				c, _ := valueobject.NewCredentialsWithTokens(testAppleID, "token", "456")
+				c, err := valueobject.NewCredentialsWithTokens(testAppleID, "token", "456")
+				if err != nil {
+					panic(err)
+				}
+
 				return c
 			},
 			expected: false,
@@ -351,13 +405,21 @@ func TestCredentials_Equals(t *testing.T) {
 		{
 			name: "different kbsync",
 			creds1: func() *valueobject.Credentials {
-				c, _ := valueobject.NewCredentialsWithTokens(testAppleID, "token", "123")
+				c, err := valueobject.NewCredentialsWithTokens(testAppleID, "token", "123")
+				if err != nil {
+					panic(err)
+				}
 				c.SetKbsync("kbsync1")
+
 				return c
 			},
 			creds2: func() *valueobject.Credentials {
-				c, _ := valueobject.NewCredentialsWithTokens(testAppleID, "token", "123")
+				c, err := valueobject.NewCredentialsWithTokens(testAppleID, "token", "123")
+				if err != nil {
+					panic(err)
+				}
 				c.SetKbsync("kbsync2")
+
 				return c
 			},
 			expected: false,
@@ -365,7 +427,11 @@ func TestCredentials_Equals(t *testing.T) {
 		{
 			name: "nil comparison",
 			creds1: func() *valueobject.Credentials {
-				c, _ := valueobject.NewCredentialsWithTokens(testAppleID, "token", "123")
+				c, err := valueobject.NewCredentialsWithTokens(testAppleID, "token", "123")
+				if err != nil {
+					panic(err)
+				}
+
 				return c
 			},
 			creds2: func() *valueobject.Credentials {
@@ -374,9 +440,13 @@ func TestCredentials_Equals(t *testing.T) {
 			expected: false,
 		},
 		{
-			name: "same instance",
+			name: sameInstanceName,
 			creds1: func() *valueobject.Credentials {
-				c, _ := valueobject.NewCredentialsWithTokens(testAppleID, "token", "123")
+				c, err := valueobject.NewCredentialsWithTokens(testAppleID, "token", "123")
+				if err != nil {
+					panic(err)
+				}
+
 				return c
 			},
 			creds2: func() *valueobject.Credentials {
@@ -392,9 +462,9 @@ func TestCredentials_Equals(t *testing.T) {
 
 			creds1 := tt.creds1()
 			creds2 := tt.creds2()
-			
+
 			// Handle same instance case
-			if tt.name == "same instance" {
+			if tt.name == sameInstanceName {
 				creds2 = creds1
 			}
 

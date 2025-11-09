@@ -106,6 +106,8 @@ func TestChartItem_Accessors(t *testing.T) {
 	item := entity.NewChartItem(app, 42, entity.ChartTypeTopPaid)
 
 	t.Run("Application", func(t *testing.T) {
+		t.Parallel()
+
 		if item.Application() != app {
 			t.Error("Application should match")
 		}
@@ -116,12 +118,16 @@ func TestChartItem_Accessors(t *testing.T) {
 	})
 
 	t.Run("Position", func(t *testing.T) {
+		t.Parallel()
+
 		if item.Position() != 42 {
 			t.Errorf("Expected position 42, got %d", item.Position())
 		}
 	})
 
 	t.Run("ChartType", func(t *testing.T) {
+		t.Parallel()
+
 		if item.ChartType() != entity.ChartTypeTopPaid {
 			t.Errorf("Expected ChartTypeTopPaid, got %s", item.ChartType())
 		}
